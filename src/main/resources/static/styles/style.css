@@ -1,0 +1,642 @@
+/* Общие стили */
+:root {
+    --primary-color: #8d6e63; /* Коричнево-бежевый */
+    --secondary-color: #b08d57; /* Золотистый */
+    --accent-color: #e0c0a0; /* Светло-бежевый, почти персиковый */
+    --text-color: #5d4037; /* Темно-коричневый */
+    --bg-light: #fdf6f0; /* Очень светлый кремовый */
+    --bg-white: #ffffff;
+    --font-headings: 'Great Vibes', cursive;
+    --font-body: 'Montserrat', sans-serif; /* Более современный шрифт для тела */
+    --font-alt: 'Lora', serif; /* Для акцентного текста */
+}
+
+body {
+    font-family: var(--font-body);
+    margin: 0;
+    padding: 0;
+    color: var(--text-color);
+    background-color: var(--bg-light);
+    line-height: 1.7;
+    font-size: 16px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+h1, h2, h3, h4 {
+    font-family: var(--font-headings);
+    color: var(--primary-color);
+    font-weight: normal;
+    margin-top: 0;
+}
+
+h2 { font-size: 3em; margin-bottom: 30px; text-align: center; }
+h3 { font-size: 2.2em; margin-bottom: 20px; color: var(--secondary-color); }
+h4 { font-size: 1.8em; margin-bottom: 10px; color: var(--primary-color); font-family: var(--font-alt); font-weight: 700;}
+
+p {
+    margin-bottom: 15px;
+}
+
+a {
+    color: var(--secondary-color);
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+.button {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: var(--secondary-color);
+    color: var(--bg-white);
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+.button:hover {
+    background-color: var(--primary-color);
+    text-decoration: none;
+}
+
+.divider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--accent-color), transparent);
+    margin: 40px 0;
+}
+
+.content-section {
+    padding: 60px 0;
+}
+
+.alt-bg {
+    background-color: var(--bg-white);
+    border-top: 1px solid var(--accent-color);
+    border-bottom: 1px solid var(--accent-color);
+}
+
+/* Секция Hero */
+#hero {
+    min-height: 100vh;
+    background: url('images/background-hero.jpg') no-repeat center center/cover; /* Замените на свое фото */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--bg-white);
+    position: relative;
+    padding: 20px;
+}
+#hero::before { /* Затемняющий оверлей */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Настройте прозрачность */
+}
+.hero-content {
+    position: relative; /* Чтобы был поверх оверлея */
+    z-index: 1;
+}
+.save-the-date {
+    font-family: var(--font-alt);
+    font-size: 1.5em;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    color: var(--accent-color);
+}
+.couple-names-hero {
+    font-family: var(--font-headings);
+    font-size: 5em; /* Увеличено для главного экрана */
+    margin: 0 0 10px;
+    line-height: 1.1;
+    color: var(--bg-white);
+}
+.wedding-date-hero {
+    font-family: var(--font-alt);
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+.invitation-phrase {
+    font-size: 1.2em;
+    max-width: 600px;
+    margin: 0 auto 30px;
+}
+
+/* Таймер обратного отсчета */
+#countdown {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Пространство между блоками таймера */
+    margin-top: 30px;
+}
+.countdown-item {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px 20px;
+    border-radius: 8px;
+    min-width: 80px;
+}
+.countdown-item span:first-child {
+    font-size: 2.5em;
+    font-weight: 700;
+    display: block;
+    font-family: var(--font-body);
+}
+.countdown-item span:last-child {
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: var(--font-body);
+}
+
+/* Навигация */
+.sticky-nav {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 15px 0;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-bottom: 1px solid var(--accent-color);
+}
+.sticky-nav a {
+    margin: 0 15px;
+    font-weight: 500;
+    color: var(--primary-color);
+    font-size: 1.1em;
+    transition: color 0.3s;
+}
+.sticky-nav a:hover {
+    color: var(--secondary-color);
+    text-decoration: none;
+}
+
+
+/* Секция Приглашение и Детали */
+#invitation-details .intro-text {
+    font-size: 1.1em;
+    text-align: center;
+    font-family: var(--font-alt);
+    font-style: italic;
+    color: #777;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.event-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+.event-item {
+    flex: 1;
+    min-width: 280px; /* Для адаптивности */
+    background-color: var(--bg-white);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    border-left: 5px solid var(--secondary-color);
+}
+.event-item p {
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}
+.event-item strong {
+    color: var(--primary-color);
+}
+.dress-code {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f9f5f0; /* Чуть темнее основного фона */
+    border-radius: 8px;
+    text-align: center;
+}
+.dress-code h4 {
+    margin-bottom: 15px;
+}
+.color-palette span {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin: 5px;
+    border: 1px solid #ccc;
+}
+
+/* Секция Наша История */
+.story-content {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+.story-photo {
+    width: 300px; /* Настройте размер */
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    object-fit: cover; /* Чтобы фото не искажалось */
+}
+.story-content p {
+    flex: 1;
+    font-size: 1.05em;
+    line-height: 1.8;
+}
+
+/* Секция Галерея */
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+.photo-grid img {
+    width: 100%;
+    height: 200px; /* Фиксированная высота для единообразия */
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.photo-grid img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* Секция Место (Карта) */
+.map-container {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+.venue-photo {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 30px auto 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    max-height: 400px; /* Ограничение по высоте */
+}
+
+/* Секция RSVP */
+#rsvp .container {
+    text-align: center;
+}
+.rsvp-options {
+    margin: 30px 0;
+}
+.rsvp-options p {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+.rsvp-options strong {
+    font-family: var(--font-alt);
+    font-weight: 700;
+    font-size: 1.2em;
+}
+.wishlist-info {
+    font-size: 0.9em;
+    color: #777;
+    margin-top: 40px;
+    font-style: italic;
+}
+
+
+/* Футер */
+footer {
+    background-color: var(--primary-color);
+    color: var(--bg-light);
+    text-align: center;
+    padding: 30px 20px;
+    margin-top: 50px;
+}
+.footer-names {
+    font-family: var(--font-headings);
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+footer p {
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    h2 { font-size: 2.5em; }
+    h3 { font-size: 2em; }
+    .couple-names-hero { font-size: 3.5em; }
+    .wedding-date-hero { font-size: 1.5em; }
+
+    .story-content {
+        flex-direction: column;
+    }
+    .story-photo {
+        width: 100%;
+        max-width: 350px; /* Ограничение на мобильных */
+        margin-bottom: 20px;
+    }
+
+    .event-info {
+        flex-direction: column;
+    }
+    .event-item {
+        min-width: 100%;
+    }
+
+    .sticky-nav {
+        padding: 10px 0;
+    }
+    .sticky-nav a {
+        margin: 0 8px;
+        font-size: 1em;
+    }
+
+    #countdown {
+        gap: 10px;
+        flex-wrap: wrap; /* Позволит переноситься если не влезают */
+    }
+    .countdown-item {
+        padding: 10px 15px;
+        min-width: 70px;
+    }
+    .countdown-item span:first-child {
+        font-size: 2em;
+    }
+}
+
+@media (max-width: 480px) {
+    .couple-names-hero { font-size: 2.8em; }
+    .wedding-date-hero { font-size: 1.3em; }
+    h2 { font-size: 2em; }
+    
+    .photo-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+    .photo-grid img {
+        height: 150px;
+    }
+
+    .sticky-nav {
+        font-size: 0.9em; /* Уменьшить шрифт в навбаре для маленьких экранов */
+    }
+    .sticky-nav a {
+        margin: 0 5px;
+    }
+
+     #countdown {
+        transform: scale(0.9); /* Немного уменьшить таймер */
+    }
+}
+
+/* Стили для модальных окон RSVP */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1001; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto; /* Вертикальная прокрутка если контент не влезает */
+    background-color: rgba(0,0,0,0.65); 
+    padding-top: 40px; 
+    padding-bottom: 40px;
+}
+
+.modal-content {
+    background-color: var(--bg-white);
+    margin: 0 auto; /* Центрирование */
+    padding: 30px 35px;
+    border: 1px solid #ddd;
+    width: 90%; 
+    max-width: 650px; 
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    position: relative;
+    text-align: left; 
+}
+
+.modal-content h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 2em; 
+    color: var(--primary-color);
+}
+
+.close-button {
+    color: #777;
+    font-size: 32px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    transition: color 0.2s;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: var(--text-color);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: 1.05em;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="tel"] {
+    width: 100%; 
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: var(--font-body);
+    font-size: 1em;
+    box-sizing: border-box; /* Учитывать padding и border в общей ширине */
+}
+.form-group input[type="number"] {
+    -moz-appearance: textfield; /* Убрать стрелочки в Firefox */
+}
+.form-group input::-webkit-outer-spin-button,
+.form-group input::-webkit-inner-spin-button {
+  -webkit-appearance: none; /* Убрать стрелочки в Chrome, Safari, Edge, Opera */
+  margin: 0;
+}
+.form-group small {
+    display: block;
+    font-size: 0.85em;
+    color: #777;
+    margin-top: 5px;
+}
+
+
+.guest-entry {
+    border: 1px solid var(--accent-color);
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    background-color: #fdf9f6; /* Слегка отличный фон */
+}
+.guest-entry h4 {
+    margin-top:0;
+    margin-bottom: 18px;
+    font-family: var(--font-alt); 
+    font-weight: 700;
+    font-size: 1.4em;
+    color: var(--secondary-color);
+    border-bottom: 1px dashed var(--accent-color);
+    padding-bottom: 8px;
+}
+
+.drink-options-container {
+    margin-top: 10px;
+}
+.drink-options-container p {
+    font-weight: 500;
+    margin-bottom: 10px;
+    font-size: 1em;
+}
+.drink-options label {
+    display: block; /* Каждый напиток на новой строке для лучшей читаемости */
+    margin-bottom: 10px;
+    font-weight: normal;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: var(--text-color);
+}
+.drink-options input[type="checkbox"] {
+    margin-right: 8px;
+    vertical-align: middle;
+    width: 16px; /* Размер чекбокса */
+    height: 16px; /* Размер чекбокса */
+}
+.drink-preference-note {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 25px;
+    text-align: center;
+    font-style: italic;
+    padding: 0 10px;
+}
+
+.modal-content .button {
+    display: block; 
+    width: auto; 
+    min-width: 200px;
+    margin: 25px auto 0; 
+    padding: 14px 35px;
+    font-size: 1.1em;
+}
+
+/* Текст для ручного подтверждения */
+.rsvp-manual-contact {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 0.95em;
+    color: #777;
+    line-height: 1.6;
+}
+
+
+@media (max-width: 768px) {
+    .modal-content {
+        padding: 25px 20px;
+    }
+    .modal-content h2 {
+        font-size: 1.8em;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        width: 95%;
+        padding: 20px 15px;
+    }
+    .modal-content h2 {
+        font-size: 1.6em;
+    }
+    .modal-content .button {
+        padding: 12px 25px;
+        font-size: 1em;
+        min-width: 180px;
+    }
+}
+
+/* Preloader Styles */
+#preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75); /* Полупрозрачный темный фон */
+    z-index: 9999; /* Выше всего остального контента */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.7s ease-out, visibility 0.7s ease-out; /* Плавное исчезновение */
+}
+
+#preloader img {
+    max-width: 70%; /* Максимальная ширина конверта */
+    max-height: 70vh; /* Максимальная высота конверта */
+    cursor: pointer;
+    border-radius: 10px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    animation: pulseEnvelope 2.5s infinite ease-in-out;
+    transition: transform 0.3s ease;
+}
+
+#preloader img:hover {
+    transform: scale(1.03); /* Небольшое увеличение при наведении */
+}
+
+@keyframes pulseEnvelope {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Класс для скрытия прелоадера */
+.preloader-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; /* Игнорировать события мыши после скрытия */
+}
+
+/* Дополнительно, чтобы избежать прокрутки пока прелоадер активен */
+body.preloader-active {
+    overflow: hidden;
+}
