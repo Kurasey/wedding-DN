@@ -1,22 +1,23 @@
 package io.github.kurasey.wedding_invitation.controller;
 
-import io.github.kurasey.wedding_invitation.exception.NotFoundFamily;
+import io.github.kurasey.wedding_invitation.config.InvitationParametersHolder;
 import io.github.kurasey.wedding_invitation.model.Family;
-import io.github.kurasey.wedding_invitation.model.Guest;
-import io.github.kurasey.wedding_invitation.model.VisitHistoryRecord;
 import io.github.kurasey.wedding_invitation.service.FamilyService;
 import io.github.kurasey.wedding_invitation.service.GuestService;
 import io.github.kurasey.wedding_invitation.service.VisitHistoryService;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -25,53 +26,151 @@ public class AdminController {
     private final GuestService guestService;
     private final FamilyService familyService;
     private final VisitHistoryService historyService;
+    private final InvitationParametersHolder parametersHolder;
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
-    public AdminController(GuestService guestService, FamilyService familyService, VisitHistoryService historyService) {
+    public AdminController(GuestService guestService, FamilyService familyService,
+                           VisitHistoryService historyService, InvitationParametersHolder parametersHolder) {
         this.guestService = guestService;
         this.familyService = familyService;
         this.historyService = historyService;
+        this.parametersHolder = parametersHolder;
     }
 
-    @GetMapping
-    public String adminDashboard() {
-        return "admin/dashboard";
+    private String getBaseUrl() {
+        return ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
     }
 
     @GetMapping("/families")
-    public String listFamilies(Model model) {
-        model.addAttribute(familyService.getAllFamilies());
-        return "/admin/families/list";
-    }
-
-///*    @GetMapping("/families/new")
-//    public String showNewFamilyForm(Model model) {
-//        model.addAttribute("family", new Family());
-//        return "admin/families/form";
-//    }*/
-
-/*    @GetMapping("/families/edit/{id}")
-    public String showEditFamilyForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-        try {
-            model.addAttribute(familyService.getFamilyById(id));
-        } catch (NotFoundFamily notFoundFamily) {
-
+    public String listFamilies(Model model, @RequestParam(defaultValue = "false") boolean showProblemOnly) {
+        List<Family> families = familyService.getAllFamilies();
+        if (showProblemOnly) {
+            families = families.stream()
+                    .filter(f -> f.isExpiredDeadline() && f.getGuests().isEmpty())
+                    .collect(Collectors.toList());
         }
-    }*/
-
-
-   /* @ModelAttribute("families")
-    List<Family> families() {
-        return familyService.getAllFamilies();
+        model.addAttribute("families", families);
+        model.addAttribute("showProblemOnly", showProblemOnly);
+        model.addAttribute("activePage", "families");
+        return "admin/families";
     }
 
-    @ModelAttribute("guests")
-    List<Guest> guests() {
-        return guestService.findAll();
+    @GetMapping("/families/new")
+    public String showCreateFamilyForm(Model model) {
+        Family family = new Family();
+        family.setConfirmationDeadline(parametersHolder.getConfirmationDeadline());
+        family.setActive(true);
+        family.setMaxAvailableGuestCount(2);
+        model.addAttribute("family", family);
+        model.addAttribute("pageTitle", "Добавить новую семью");
+        model.addAttribute("activePage", "families");
+        return "admin/family-form";
     }
 
-    @ModelAttribute("history")
-    List<VisitHistoryRecord> visitHistoryRecords() {
-        return historyService.findAll();
-    }*/
+    @PostMapping("/families")
+    public String createFamily(@Valid @ModelAttribute("family") Family family,
+                               BindingResult result,
+                               RedirectAttributes redirectAttributes,
+                               Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("pageTitle", "Добавить новую семью");
+            model.addAttribute("activePage", "families");
+            return "admin/family-form";
+        }
+        Family savedFamily = familyService.createFamily(family);
+        redirectAttributes.addFlashAttribute("successMessage", "Семья '" + family.getName() + "' успешно создана! Код: " + savedFamily.getPersonalLink());
+        return "redirect:/admin/families";
+    }
 
+    @GetMapping("/families/{id}/edit")
+    public String showEditFamilyForm(@PathVariable("id") Long id, Model model) { // HttpServletRequest убран
+        Family family = familyService.getFamilyById(id);
+        model.addAttribute("family", family);
+        model.addAttribute("pageTitle", "Редактировать семью: " + family.getName());
+        model.addAttribute("activePage", "families");
+        model.addAttribute("baseUrl", getBaseUrl()); // <-- ПЕРЕДАЕМ БАЗОВЫЙ URL
+        return "admin/family-form";
+    }
+
+    @PostMapping("/families/{id}/edit")
+    public String updateFamily(@PathVariable("id") Long id,
+                               @Valid @ModelAttribute("family") Family familyDetails,
+                               BindingResult result,
+                               RedirectAttributes redirectAttributes, Model model) {
+        if (result.hasErrors()) {
+            familyDetails.setId(id);
+            model.addAttribute("pageTitle", "Редактировать семью: " + (familyDetails.getName() != null ? familyDetails.getName() : ""));
+            model.addAttribute("activePage", "families");
+            model.addAttribute("baseUrl", getBaseUrl()); // <-- ПЕРЕДАЕМ БАЗОВЫЙ URL ПРИ ОШИБКЕ
+            return "admin/family-form";
+        }
+        familyService.updateFamily(id, familyDetails);
+        redirectAttributes.addFlashAttribute("successMessage", "Семья '" + familyDetails.getName() + "' успешно обновлена!");
+        return "redirect:/admin/families";
+    }
+
+    @PostMapping("/families/{id}/delete")
+    public String deleteFamily(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        try {
+            Family family = familyService.getFamilyById(id);
+            familyService.deleteFamily(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Семья '" + family.getName() + "' и вся связанная информация успешно удалены!");
+        } catch (DataIntegrityViolationException e) {
+            logger.error("Could not delete family with ID {}: {}", id, e.getMessage()); // Добавим лог для отладки
+            redirectAttributes.addFlashAttribute("errorMessage", "Невозможно удалить семью. Возможно, на нее еще есть ссылки в других частях системы.");
+        } catch (Exception e) {
+            logger.error("An unexpected error occurred while deleting family with ID {}", id, e);
+            redirectAttributes.addFlashAttribute("errorMessage", "Произошла непредвиденная ошибка при удалении семьи.");
+        }
+        return "redirect:/admin/families";
+    }
+
+    @GetMapping("/families/{id}")
+    public String viewFamilyDetails(@PathVariable("id") Long id, Model model) {
+        Family family = familyService.getFamilyById(id);
+        model.addAttribute("family", family);
+        model.addAttribute("activePage", "families"); // <-- ДОБАВЛЕНО
+        return "admin/family-details";
+    }
+
+    @GetMapping("/guests")
+    public String listAllGuests(Model model,
+                                @RequestParam(name = "attending", required = false) Boolean attending,
+                                @RequestParam(name = "transfer", required = false) Boolean transfer,
+                                @RequestParam(name = "placement", required = false) Boolean placement) {
+
+        model.addAttribute("guests", guestService.findWithFilters(attending, transfer, placement));
+
+        // Для сохранения состояния фильтров в HTML
+        model.addAttribute("filterAttending", attending);
+        model.addAttribute("filterTransfer", transfer);
+        model.addAttribute("filterPlacement", placement);
+
+        model.addAttribute("activePage", "guests");
+        return "admin/guests";
+    }
+
+    @GetMapping
+    public String adminDashboard(Model model) {
+        model.addAttribute("stats", guestService.getDashboardStats());
+        model.addAttribute("totalFamilies", familyService.getAllFamilies().size());
+        model.addAttribute("visitCount", historyService.countAll());
+        return "admin/dashboard";
+    }
+
+
+    @GetMapping("/history")
+    public String viewVisitHistory(Model model, @RequestParam(required = false) Long familyId) {
+        if (familyId != null) {
+            Family family = familyService.getFamilyById(familyId);
+            model.addAttribute("historyRecords", historyService.historyByPersonalLink(family.getPersonalLink()));
+        } else {
+            model.addAttribute("historyRecords", historyService.findAll());
+        }
+
+        model.addAttribute("allFamilies", familyService.getAllFamilies()); // Для выпадающего списка
+        model.addAttribute("selectedFamilyId", familyId); // Для сохранения выбора в фильтре
+        model.addAttribute("activePage", "history");
+        return "admin/history";
+    }
 }

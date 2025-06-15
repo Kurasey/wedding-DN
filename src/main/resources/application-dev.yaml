@@ -1,3 +1,6 @@
 admin:
-  username: dya
-  password: 19052013
+  username: admin
+  password: admin
+telegram:
+  bot-token: 7742685719:AAFZFUK1fso3Xu1a5UeSKXs0T229YeknRt4
+  groom-chat-id: 510437569

@@ -1,10 +1,11 @@
 package io.github.kurasey.wedding_invitation.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest; // <-- ИМПОРТ
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,12 +34,35 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain (HttpSecurity httpSecurity) throws Exception{
-        return httpSecurity.authorizeHttpRequests(
-                registry -> registry
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/admin/**")).authenticated()
-                        .requestMatchers("/**").permitAll())
-                .httpBasic(Customizer.withDefaults())
-                .build();
+        httpSecurity
+                .authorizeHttpRequests(registry -> registry
+                        // Явно разрешаем доступ ко всем статическим ресурсам (CSS, JS, изображения, аудио)
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/admin/**")).hasRole("ADMIN")
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).hasRole("ADMIN")
+                        .requestMatchers("/**").permitAll()
+                )
+                .formLogin(formLogin -> formLogin
+                        .loginPage("/login")
+                        .loginProcessingUrl("/perform_login")
+                        .defaultSuccessUrl("/admin", true)
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/perform_logout")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .deleteCookies("JSESSIONID")
+                        .permitAll()
+                )
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**"))
+                )
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+                );
+
+        return httpSecurity.build();
     }
 
 }

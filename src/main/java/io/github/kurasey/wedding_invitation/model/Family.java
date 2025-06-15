@@ -1,11 +1,12 @@
 package io.github.kurasey.wedding_invitation.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Family {
@@ -17,110 +18,104 @@ public class Family {
     @Version
     private Long version;
 
-    @NotNull
+    @NotBlank(message = "Название семьи не может быть пустым")
+    @Size(min = 2, max = 100, message = "Название должно быть от 2 до 100 символов")
     private String name;
 
-    @NotNull
+    @Column(unique = true)
     private String personalLink;
 
-    @NotNull
+    @NotBlank(message = "Обращение не может быть пустым")
+    @Size(max = 500, message = "Обращение не должно превышать 500 символов")
     private String appeal;
 
     private String phone;
 
-    private boolean isActive;
+    @Column(name = "is_active")
+    private boolean active;
 
-    private boolean isTransferRequired;
+    @Column(name = "is_transfer_required")
+    private boolean transferRequired;
 
-    private boolean isPlacementRequired;
+    @Column(name = "is_placement_required")
+    private boolean placementRequired;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "family", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("name ASC")
     private List<Guest> guests = new ArrayList<>();
 
-    @NotNull
-    private LocalDateTime confirmationDeadline;
+    @OneToMany(mappedBy = "family", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VisitHistoryRecord> visitHistory = new ArrayList<>();
 
-    public Family(String name, String personalLink, String appeal, LocalDateTime confirmationDeadline) {
+    @NotNull(message = "Дедлайн подтверждения обязателен")
+    @Future(message = "Дедлайн подтверждения должен быть в будущем")
+    private LocalDate confirmationDeadline;
+
+    @Min(value = 1, message = "Минимум 1 гость")
+    @Max(value = 10, message = "Максимум 10 гостей")
+    private int maxAvailableGuestCount;
+
+    public boolean isExpiredDeadline() {
+        return confirmationDeadline != null && LocalDate.now().isAfter(confirmationDeadline);
+    }
+
+    public Family(String name, String personalLink, String appeal, LocalDate confirmationDeadline) {
         this.name = name;
         this.personalLink = personalLink;
         this.appeal = appeal;
         this.confirmationDeadline = confirmationDeadline;
+        this.active = true;
+        this.maxAvailableGuestCount = 2; // Значение по-умолчанию
     }
 
-    private Family() {
+    public Family() {
+        this.active = true;
+        this.guests = new ArrayList<>();
+        this.maxAvailableGuestCount = 2; // Значение по-умолчанию
     }
 
-    public Long getId() {
-        return id;
+    // Standard Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getVersion() { return version; }
+    public void setVersion(Long version) { this.version = version; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getPersonalLink() { return personalLink; }
+    public void setPersonalLink(String personalLink) { this.personalLink = personalLink; }
+    public String getAppeal() { return appeal; }
+    public void setAppeal(String appeal) { this.appeal = appeal; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+    public boolean isTransferRequired() { return transferRequired; }
+    public void setTransferRequired(boolean transferRequired) { this.transferRequired = transferRequired; }
+    public boolean isPlacementRequired() { return placementRequired; }
+    public void setPlacementRequired(boolean placementRequired) { this.placementRequired = placementRequired; }
+    public List<Guest> getGuests() { return guests; }
+    public void setGuests(List<Guest> guests) { this.guests = guests; }
+    public LocalDate getConfirmationDeadline() { return confirmationDeadline; }
+    public void setConfirmationDeadline(LocalDate confirmationDeadline) { this.confirmationDeadline = confirmationDeadline; }
+    public int getMaxAvailableGuestCount() { return maxAvailableGuestCount; }
+    public void setMaxAvailableGuestCount(int maxAvailableGuestCount) { this.maxAvailableGuestCount = maxAvailableGuestCount; }
+    public List<VisitHistoryRecord> getVisitHistory() {
+        return visitHistory;
+    }
+    public void setVisitHistory(List<VisitHistoryRecord> visitHistory) {
+        this.visitHistory = visitHistory;
     }
 
-    public String getPersonalLink() {
-        return personalLink;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Family family = (Family) o;
+        return id != null && Objects.equals(id, family.id);
     }
 
-    public void setPersonalLink(String personalLink) {
-        this.personalLink = personalLink;
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
-
-    public String getAppeal() {
-        return appeal;
-    }
-
-    public void setAppeal(String appeal) {
-        this.appeal = appeal;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public boolean isTransferRequired() {
-        return isTransferRequired;
-    }
-
-    public void setTransferRequired(boolean transferRequired) {
-        isTransferRequired = transferRequired;
-    }
-
-    public boolean isPlacementRequired() {
-        return isPlacementRequired;
-    }
-
-    public void setPlacementRequired(boolean placementRequired) {
-        isPlacementRequired = placementRequired;
-    }
-
-    public List<Guest> getGuests() {
-        return guests;
-    }
-
-    public void setGuests(List<Guest> guests) {
-        this.guests = guests;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
-    public LocalDateTime getConfirmationDeadline() {
-        return confirmationDeadline;
-    }
-
-    public void setConfirmationDeadline(LocalDateTime confirmationDeadline) {
-        this.confirmationDeadline = confirmationDeadline;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-
 }

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle ?: (family.id == null ? 'Добавить Семью' : 'Редактировать Семью')}">Форма Семьи</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div th:replace="~{fragments/admin-navbar :: navbar}"></div>
+<div class="container mt-4">
+    <h1 th:text="${pageTitle ?: (family.id == null ? 'Добавить Новую Семью' : 'Редактировать Семью: ' + family.name)}">Заголовок Формы</h1>
+
+    <form th:action="${family.id == null} ? @{/admin/families} : @{/admin/families/{id}/edit(id=${family.id})}"
+          th:object="${family}" method="post" class="needs-validation" novalidate>
+
+        <input type="hidden" th:if="${family.id != null}" th:field="*{id}" />
+        <input type="hidden" th:if="${family.id != null}" th:field="*{version}" />
+
+        <div class="form-row">
+            <div class="col-md-6 mb-3">
+                <label for="name">Название Семьи *</label>
+                <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+            </div>
+
+            <!-- Поле для ручного ввода ссылки (только при создании) -->
+            <div class="col-md-6 mb-3" th:if="${family.id == null}">
+                <label for="personalLink">Персональная ссылка (необязательно)</label>
+                <input type="text" class="form-control" id="personalLink" th:field="*{personalLink}"
+                       placeholder="Оставьте пустым для автогенерации">
+                <small class="form-text text-muted">Можно использовать буквы и цифры. Например: best_friends</small>
+            </div>
+
+            <!-- Поле для отображения готовой ссылки (только при редактировании) -->
+            <div class="col-md-6 mb-3" th:if="${family.id != null && family.personalLink != null}">
+                <label for="personalLinkDisplay">Персональная ссылка</label>
+                <input type="text" class="form-control" id="personalLinkDisplay" th:value="${baseUrl} + '/' + *{personalLink}" readonly>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="appeal">Обращение * (текст для приглашения)</label>
+            <textarea class="form-control" id="appeal" th:field="*{appeal}" rows="3" required></textarea>
+            <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('appeal')}" th:errors="*{appeal}"></div>
+        </div>
+
+        <div class="form-row">
+            <div class="col-md-4 mb-3">
+                <label for="phone">Телефон</label>
+                <input type="tel" class="form-control" id="phone" th:field="*{phone}">
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="confirmationDeadline">Дедлайн подтверждения *</label>
+                <input type="date" class="form-control" id="confirmationDeadline" required
+                       name="confirmationDeadline"
+                       th:value="*{confirmationDeadline != null ? #temporals.format(confirmationDeadline, 'yyyy-MM-dd') : ''}">
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('confirmationDeadline')}" th:errors="*{confirmationDeadline}"></div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="maxAvailableGuestCount">Макс. кол-во гостей *</label>
+                <input type="number" class="form-control" id="maxAvailableGuestCount" th:field="*{maxAvailableGuestCount}" required min="1" max="10">
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('maxAvailableGuestCount')}" th:errors="*{maxAvailableGuestCount}"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="form-check form-check-inline">
+                <input type="checkbox" class="form-check-input" id="isActive" th:field="*{active}">
+                <label class="form-check-label" for="isActive">Активна</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="checkbox" class="form-check-input" id="isTransferRequired" th:field="*{transferRequired}">
+                <label class="form-check-label" for="isTransferRequired">Требуется трансфер</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="checkbox" class="form-check-input" id="isPlacementRequired" th:field="*{placementRequired}">
+                <label class="form-check-label" for="isPlacementRequired">Требуется размещение</label>
+            </div>
+        </div>
+        <p class="mt-2"><small>* Обязательные поля</small></p>
+        <button type="submit" class="btn btn-primary" th:text="${family.id == null ? 'Создать Семью' : 'Сохранить Изменения'}">Отправить</button>
+        <a th:href="@{/admin/families}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+<script>
+    (function() { 'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
+</body>
+</html>

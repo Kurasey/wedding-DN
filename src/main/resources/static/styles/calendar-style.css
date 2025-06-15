@@ -1,0 +1,107 @@
+/* Стили для свадебного календаря */
+.wedding-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 дней в неделе */
+    gap: 8px; /* Отступы между ячейками */
+    max-width: 450px; /* Максимальная ширина календаря */
+    margin: 30px auto; /* Центрирование и отступ сверху/снизу */
+    font-family: 'Georgia', serif; /* Используйте шрифт, подходящий к стилю свадьбы */
+    border: 1px solid #e0c4c4; /* Нежная рамка для календаря */
+    padding: 15px;
+    border-radius: 10px;
+    background-color: #fff9f9; /* Очень светлый фон */
+}
+
+.calendar-title {
+    grid-column: 1 / -1; /* Заголовок занимает всю ширину */
+    text-align: center;
+    font-size: 1.6em;
+    font-weight: bold;
+    color: #8c5d5d; /* Цвет заголовка */
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #e0c4c4;
+}
+
+.calendar-header {
+    padding: 8px 5px;
+    text-align: center;
+    font-weight: bold;
+    color: #a07070; /* Цвет дней недели */
+    font-size: 0.9em;
+}
+
+.calendar-day,
+.calendar-empty-day {
+    padding: 10px 5px;
+    text-align: center;
+    border: 1px solid #f0d8d8; /* Нежная рамка для дней */
+    border-radius: 5px;
+    background-color: #ffffff;
+    position: relative; /* Для позиционирования сердечка */
+    min-height: 50px; /* Минимальная высота ячейки */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-empty-day {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.calendar-day-number {
+    font-size: 1.1em;
+    color: #555;
+    position: relative; /* Чтобы число было поверх сердца, если нужно */
+    z-index: 2;
+}
+
+/* Специальные стили для дня свадьбы (13 число) */
+.wedding-day-cell {
+    background-color: #ffe0e0; /* Легкий акцент на дне свадьбы */
+    font-weight: bold;
+}
+
+.wedding-day-cell .calendar-day-number {
+    color: #d9534f; /* Цвет числа дня свадьбы */
+}
+
+.heart-container {
+    position: absolute;
+    top: 5px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+
+.heart-path {
+    stroke: #fa0606;
+    stroke-width: 3;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    fill: transparent;
+    animation: draw-heart 4s ease-in-out forwards;
+    filter: drop-shadow(0 0 5px rgba(233, 30, 99, 0.5));
+    transform-origin: center;
+}
+
+
+@keyframes draw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes beat {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.1); }
+    40% { transform: scale(1); }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}

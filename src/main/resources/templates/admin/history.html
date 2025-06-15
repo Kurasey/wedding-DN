@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>История Посещений</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .table-responsive { max-height: 75vh; }
+        .user-agent { max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/admin-navbar :: navbar}"></div>
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>История Посещений</h1>
+        <form th:action="@{/admin/history}" method="get" class="form-inline">
+            <div class="form-group mr-2">
+                <label for="familyFilter" class="mr-2">Фильтр по семье:</label>
+                <select id="familyFilter" name="familyId" class="form-control" onchange="this.form.submit()">
+                    <option value="">Все семьи</option>
+                    <option th:each="fam : ${allFamilies}"
+                            th:value="${fam.id}"
+                            th:text="${fam.name}"
+                            th:selected="${selectedFamilyId != null and selectedFamilyId == fam.id}"></option>
+                </select>
+            </div>
+            <a th:href="@{/admin/history}" class="btn btn-secondary">Сбросить</a>
+        </form>
+    </div>
+    <p>Всего записей: <strong th:text="${#lists.size(historyRecords)}">0</strong></p>
+    <div class="table-responsive">
+        <table class="table table-hover table-sm">
+            <thead class="thead-light sticky-top">
+            <tr>
+                <th>Дата и время</th>
+                <th>Семья</th>
+                <th>URI</th>
+                <th>IP Адрес</th>
+                <th title="Информация о браузере и устройстве">User Agent</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="record : ${historyRecords}">
+                <td th:text="${#temporals.format(record.visitedAt, 'dd.MM.yyyy HH:mm:ss')}"></td>
+                <!-- ИЗМЕНЕНО -->
+                <td>
+                    <a th:if="${record.family != null}" th:href="@{/admin/families/{id}(id=${record.family.id})}" th:text="${record.family.name}"></a>
+                    <span th:if="${record.family == null}" th:text="${record.personalLink}" class="text-muted"></span>
+                </td>
+                <td th:text="${record.URI}"></td>
+                <td th:text="${record.remoteIpAddress}"></td>
+                <td class="user-agent" th:title="${record.userAgent}" th:text="${record.userAgent}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(historyRecords)}">
+                <td colspan="5" class="text-center">История посещений пуста.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

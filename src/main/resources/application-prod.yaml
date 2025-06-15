@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+admin:
+  username: ${ADMIN_USER}
+  password: ${ADMIN_PASS}
+server:
+  port: 8080
+telegram:
+  botToken: ${TELEGRAM_BOT_TOKEN}
+  groom-chat-id: ${TELEGRAM_GROOM_CHAT_ID}
+  bride-chat-id: ${TELEGRAM_BRIDE_CHAT_ID}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Детали Семьи: ' + ${family.name}">Детали Семьи</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div th:replace="~{fragments/admin-navbar :: navbar}"></div>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 th:text="'Семья: ' + ${family.name}">Детали Семьи</h1>
+        <a th:href="@{/admin/families}" class="btn btn-outline-secondary">Назад к списку семей</a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Информация о семье
+            <a th:href="@{/admin/families/{id}/edit(id=${family.id})}" class="btn btn-sm btn-primary float-right">Редактировать</a>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>ID:</strong> <span th:text="${family.id}"></span></p>
+                    <p><strong>Название:</strong> <span th:text="${family.name}"></span></p>
+                    <p><strong>Персональная ссылка:</strong>
+                        <a th:href="@{'/' + ${family.personalLink}}" th:text="${family.personalLink}" target="_blank"></a>
+                    </p>
+                    <p><strong>Телефон:</strong> <span th:text="${family.phone ?: '-'}"></span></p>
+                    <p><strong>Версия (JPA):</strong> <span th:text="${family.version}"></span></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Активна:</strong> <span th:text="${family.active ? 'Да' : 'Нет'}" th:classappend="${family.active ? 'text-success' : 'text-danger'}"></span></p>
+                    <p><strong>Требуется трансфер:</strong> <span th:text="${family.transferRequired ? 'Да' : 'Нет'}"></span></p>
+                    <p><strong>Требуется размещение:</strong> <span th:text="${family.placementRequired ? 'Да' : 'Нет'}"></span></p>
+                    <p><strong>Дедлайн подтверждения:</strong> <span th:text="${#temporals.format(family.confirmationDeadline, 'dd.MM.yyyy')}"></span></p>
+                </div>
+            </div>
+            <hr>
+            <p><strong>Обращение (текст приглашения):</strong></p>
+            <pre th:text="${family.appeal}" style="white-space: pre-wrap; background-color: #f8f9fa; padding: 10px; border-radius: 4px;"></pre>
+        </div>
+    </div>
+
+    <h2>Гости в этой семье (<span th:text="${#lists.size(family.guests)}">0</span>)</h2>
+    <a th:href="@{/admin/families/{familyId}/guests/new(familyId=${family.id})}" class="btn btn-success mb-3">Добавить гостя в эту семью</a>
+
+    <table class="table table-hover" th:if="${not #lists.isEmpty(family.guests)}">
+        <thead class="thead-light">
+        <tr>
+            <th>ID</th>
+            <th>Имя</th>
+            <th>Присутствие</th>
+            <th>Напитки</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="guest : ${family.guests}">
+            <td th:text="${guest.id}"></td>
+            <td th:text="${guest.name}"></td>
+            <td th:text="${guest.willAttend ? 'Да' : 'Нет'}" th:classappend="${guest.willAttend ? 'text-success' : 'text-danger'}"></td>
+            <td>
+                <span th:each="beverage, iterStat : ${guest.beverages}"
+                      th:text="${beverage.getName()} + (${iterStat.last} ? '' : ', ')"></span>
+                <span th:if="${#lists.isEmpty(guest.beverages)}">-</span>
+            </td>
+            <td>
+                <a th:href="@{/admin/families/{familyId}/guests/{guestId}/edit(familyId=${family.id}, guestId=${guest.id})}" class="btn btn-sm btn-primary">Ред.</a>
+                <form th:action="@{/admin/families/{familyId}/guests/{guestId}/delete(familyId=${family.id}, guestId=${guest.id})}" method="post" style="display:inline;" onsubmit="return confirm('Удалить гостя ' + [[${guest.name}]] + '?');">
+                    <button type="submit" class="btn btn-sm btn-danger">Удал.</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p th:if="${#lists.isEmpty(family.guests)}">В этой семье пока нет гостей.</p>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

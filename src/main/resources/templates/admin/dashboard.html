@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админ-панель - Сводка</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div th:replace="~{fragments/admin-navbar :: navbar}"></div>
+<div class="container mt-4">
+    <h1>Сводная информация</h1>
+    <div class="row mt-4">
+        <!-- Карточка семей -->
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Семьи</div>
+                <div class="card-body">
+                    <h5 class="card-title">Всего: <span th:text="${totalFamilies}">0</span></h5>
+                    <a th:href="@{/admin/families}" class="btn btn-light">Управление</a>
+                </div>
+            </div>
+        </div>
+        <!-- Карточка гостей -->
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Гости</div>
+                <div class="card-body">
+                    <h5 class="card-title">Подтвердили: <span th:text="${stats.confirmedGuests}">0</span> / <span th:text="${stats.totalGuests}">0</span></h5>
+                    <a th:href="@{/admin/guests}" class="btn btn-light">Список</a>
+                </div>
+            </div>
+        </div>
+        <!-- Карточка трансфера -->
+        <div class="col-md-3">
+            <div class="card text-dark bg-warning mb-3">
+                <div class="card-header">Трансфер</div>
+                <div class="card-body">
+                    <h5 class="card-title">Нужен: <span th:text="${stats.transferRequiredCount}">0</span> семей</h5>
+                    <a th:href="@{/admin/guests(transfer=true)}" class="btn btn-dark">Кто?</a>
+                </div>
+            </div>
+        </div>
+        <!-- Карточка размещения -->
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Размещение</div>
+                <div class="card-body">
+                    <h5 class="card-title">Нужно: <span th:text="${stats.placementRequiredCount}">0</span> семей</h5>
+                    <a th:href="@{/admin/guests(placement=true)}" class="btn btn-light">Кто?</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Предпочтения по напиткам (среди подтвержденных)</h2>
+    <div th:if="${stats.beverageStats.isEmpty()}" class="alert alert-secondary">
+        Нет данных о предпочтениях.
+    </div>
+    <table class="table table-striped" th:if="${!stats.beverageStats.isEmpty()}">
+        <thead class="thead-dark">
+        <tr>
+            <th>Напиток</th>
+            <th>Количество выборов</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="beverage : ${stats.allBeverages}">
+            <td th:text="${beverage.getName()}">Название напитка</td>
+            <td th:text="${stats.beverageStats.get(beverage) ?: 0}">0</td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

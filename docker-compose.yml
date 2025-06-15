@@ -1,0 +1,38 @@
+services:
+  app:
+    build: .
+    container_name: wedding-app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    # Связываем порт 8088 на хосте с портом 8080 в контейнере.
+    ports:
+      - "127.0.0.1:8088:8080"
+    depends_on:
+      - postgres
+    # Сеть больше не нужна для связи с Nginx, но она все еще нужна для связи с Postgres
+    networks:
+      - wedding-net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: wedding-db
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - wedding-net
+
+networks:
+  wedding-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local

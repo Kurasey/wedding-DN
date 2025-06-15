@@ -7,7 +7,6 @@ import io.github.kurasey.wedding_invitation.repository.FamilyRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,11 +24,6 @@ public class FamilyService {
         this.codeGenerator = codeGenerator;
     }
 
-    @Transactional
-    public Family createFamily(String name ,String appeal, LocalDateTime confirmationDeadline) {
-        return familyRepository.save(new Family(name, codeGenerator.nextUniqueCode(), appeal, confirmationDeadline));
-    }
-
     public Family getFamilyById(Long id) {
         return familyRepository.findById(id).orElseThrow(() -> new NotFoundFamily("Не найдена семья с ID " + id));
     }
@@ -43,59 +37,57 @@ public class FamilyService {
     }
 
     @Transactional
+    public Family createFamily(Family family) {
+        // Проверяем, что ссылка не задана или является пустой строкой
+        if (family.getPersonalLink() == null || family.getPersonalLink().isBlank()) {
+            family.setPersonalLink(codeGenerator.nextUniqueCode());
+        }
+        if (family.getGuests() == null) {
+            family.setGuests(new ArrayList<>());
+        }
+        return familyRepository.save(family);
+    }
+
+    @Transactional
     public Family updateFamily(Long familyId, Family familyDetails) {
         Family family = getFamilyById(familyId);
-        family.setPersonalLink(familyDetails.getPersonalLink());
+        family.setName(familyDetails.getName());
         family.setAppeal(familyDetails.getAppeal());
         family.setPhone(familyDetails.getPhone());
         family.setTransferRequired(familyDetails.isTransferRequired());
         family.setPlacementRequired(familyDetails.isPlacementRequired());
         family.setActive(familyDetails.isActive());
+        family.setConfirmationDeadline(familyDetails.getConfirmationDeadline());
+        family.setMaxAvailableGuestCount(familyDetails.getMaxAvailableGuestCount());
         return familyRepository.save(family);
     }
 
     @Transactional
     public void deleteFamily(Long id){
-        Family family = getFamilyById(id);
-        familyRepository.delete(family);
+        if (familyRepository.existsById(id)) {
+            familyRepository.deleteById(id);
+        } else {
+            throw new NotFoundFamily("Не найдена семья с ID " + id + " для удаления");
+        }
     }
 
     @Transactional
-    public Family addGuestToFamily(Long familyId, Guest guest){
+    public void addGuestToFamily(Long familyId, Guest guest) {
         Family family = getFamilyById(familyId);
-        guest = guestService.save(guest);
-        if (family.getGuests() == null) {
-            family.setGuests(new ArrayList<>());
-        }
+        guest.setFamily(family);
         family.getGuests().add(guest);
-        return familyRepository.save(family);
+        familyRepository.save(family);
     }
 
     @Transactional
-    public Family removeGuestFromFamily(Long familyId, Long guestId) {
+    public void removeGuestFromFamily(Long familyId, Long guestId) {
         Family family = getFamilyById(familyId);
-        if (family.getGuests() != null) {
-            family.getGuests().removeIf(guest -> guest.getId().equals(guestId));
-        }
-        return familyRepository.save(family);
+        family.getGuests().removeIf(guest -> guest.getId().equals(guestId));
+        familyRepository.save(family);
     }
 
     public List<Guest> getFamilyGuests(Long familyId) {
         Family family = getFamilyById(familyId);
         return family.getGuests() != null ? family.getGuests() : Collections.emptyList();
-    }
-
-    @Transactional
-    public Family updateTransferRequirement(Long id, boolean isRequired) {
-        Family family = getFamilyById(id);
-        family.setTransferRequired(isRequired);
-        return familyRepository.save(family);
-    }
-
-    @Transactional
-    public Family updatePlacementRequirement(Long id, boolean isRequired) {
-        Family family = getFamilyById(id);
-        family.setPlacementRequired(isRequired);
-        return familyRepository.save(family);
     }
 }

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${guest.id == null} ? 'Добавить гостя' : 'Редактировать гостя'">Форма гостя</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div th:replace="~{fragments/admin-navbar :: navbar}"></div>
+
+<div class="container mt-4">
+    <h1 th:text="${guest.id == null} ? 'Добавить нового гостя в семью: ' + ${family.name} : 'Редактировать гостя: ' + ${guest.name}">Заголовок</h1>
+
+    <form th:action="${guest.id == null} ? @{/admin/families/{familyId}/guests(familyId=${family.id})} : @{/admin/families/{familyId}/guests/{guestId}/edit(familyId=${family.id}, guestId=${guest.id})}"
+          th:object="${guest}" method="post">
+        <input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{family}" />
+
+        <div class="form-group">
+            <label for="name">Имя гостя</label>
+            <input type="text" class="form-control" id="name" th:field="*{name}" required>
+            <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+        </div>
+
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="willAttend" th:field="*{willAttend}">
+            <label class="form-check-label" for="willAttend">Подтверждает присутствие</label>
+        </div>
+
+        <div class="form-group">
+            <label>Предпочтения по напиткам</label>
+            <div th:each="beverage : ${allBeverages}" class="form-check">
+                <input type="checkbox" class="form-check-input" th:field="*{beverages}" th:value="${beverage}" th:id="${'beverage-' + beverage}">
+                <label class="form-check-label" th:for="${'beverage-' + beverage}" th:text="${beverage.getName()}"></label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" th:text="${guest.id == null} ? 'Добавить' : 'Сохранить'"></button>
+        <a th:href="@{/admin/families/{id}(id=${family.id})}" class="btn btn-secondary">Отмена</a>
+    </form>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -5,11 +5,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Мы Женимся! | Дмитрий и Яна</title>
-    <link rel="stylesheet" href="/static/styles/style.css">
     <link rel="stylesheet" th:href="@{/styles/style.css}">
+    <link rel="stylesheet" th:href="@{/styles/calendar-style.css}">
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-     <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
 </head>
 <body>
 
@@ -23,17 +25,25 @@
         <div class="hero-content">
 	    <p class="save-the-date"></p>
             <h1 class="couple-names-hero">Дмитрий и Яна</h1>
-            <p class="wedding-date-hero">12 сентября, 2025</p>
+            <p class="wedding-date-hero">13 сентября, 2025</p>
             <p class="invitation-phrase">Приглашаем вас разделить с нами этот счастливый день!</p>
         </div>
     </header>
 
-    <!-- Навигация -->
-    <nav class="sticky-nav">
+    <button id="musicToggle" class="burger" title="Включить/выключить музыку"></button>
+
+    <button id="burger" class="burger">☰</button>
+    <nav id="menu" class="sticky-nav hidden">
+
         <a href="#invitation-details">Приглашение</a>
+        <a href="#timeline">План дня</a>
+        <a href="#dress-code">Дресс-код</a>
+        <a href="#A_few_words_from_us">Пара слов от нас</a>
         <a href="#location">Место</a>
         <a href="#rsvp">RSVP</a>
     </nav>
+
+    <audio id="audioPlayer" th:src="@{/audio/Christina_Perri_A_Thousand_Years_(Instrumental).mp3}" type="audio/mpeg" loop></audio>
 
     <!-- Секция 2: Приглашение и детали -->
     <section id="invitation-details" class="content-section">
@@ -43,36 +53,64 @@
                 С огромной радостью и волнением в сердце мы хотим пригласить вас на самое важное событие в нашей жизни – нашу Свадьбу!
                 Этот день станет началом нашей совместной истории, и мы были бы безмерно счастливы, если бы вы разделили с нами эти незабываемые моменты.
             </p>
-            <hr class="divider">
-            <h3>Детали Торжества</h3>
-            <div class="event-info">
-                <div class="event-item">
-                    <h4>Торжественная Церемония и Банкет</h4>
-                    <p><strong>Детали уточняются, информация будет добавлена в ближайшее время</strong></p>
-                    <!-- <p><strong>Дата:</strong> [ДД Месяца ГГГГ], [День недели]</p>
-                    <p><strong>Время сбора гостей:</strong> [ЧЧ:ММ]</p> 
-                    <p><strong>Начало церемонии:</strong> [ЧЧ:ММ]</p>
-                    <p><strong>Место:</strong> Ресторан "Донская Роща"</p>
-                    <p><strong>Адрес:</strong> г. Ростов-на-Дону, ул. Кумженская, 2А</p> -->
-                </div>
-                <!-- Если церемония в другом месте, можно добавить еще один .event-item -->
-            </div>
-            <div class="dress-code">
-                <h4>Дресс-код</h4>
-                <p>Мы будем рады видеть вас в вечерних нарядах. Предпочтительная цветовая гамма: пастельные тона.</p>
-                <div class="color-palette">
-                    <span style="background-color: #e0c0a0;"></span>
-                    <span style="background-color: #b08d57;"></span>
+
+            <div class="container my-5 text-center" id="calendar-highlight-section">
+                <h2 class="display-6 mb-4">Отметьте этот день в календаре!</h2>
+                <div id="wedding-calendar-2025-09" class="wedding-calendar">
+                    <!-- Календарь будет сгенерирован JavaScript -->
                 </div>
             </div>
 
-            <div class="dress-code">
-                <h4>Пара слов от нас</h4>
-                <p>Нам очень хочется, чтобы наш день прошёл легко, тепло и по-нашему.
-                    Поэтому просим воздержаться от криков "Горько" — мы целуемся и без напоминаний 😊</p>
-                <p>Мы обожаем детей, но этот день мы хотим провести в кругу взрослых.
+            <hr class="divider">
+            <div class="event-info">
+                <div class="event-item">
+                    <section class="section-plan">
+                        <h2>План дня</h2>
+                        <div class="timeline" id="timeline">
+                            <div class="timeline-item">
+                                <img th:src="@{/images/glasses.png}" alt="Фуршет">
+                                <div>16:00<br>Сбор гостей</div>
+                            </div>
+                            <div class="timeline-item">
+                                <img th:src="@{/images/rings.png}" alt="Свадебная церемония">
+                                <div>16:30<br>Свадебная церемония</div>
+                            </div>
+                            <div class="timeline-item">
+                                <img th:src="@{/images/plate.png}" alt="Начало банкета">
+                                <div>17:00<br>Начало банкета</div>
+                            </div>
+                            <div class="timeline-item">
+                                <img th:src="@{/images/cake.png}" alt="Торт">
+                                <div>21:00<br>Торт</div>
+                            </div>
+                            <div class="timeline-item">
+                                <img th:src="@{/images/moon.png}" alt="Ночь">
+                                <div>23:00<br>Окончание вечера</div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <div class="dress-code" id="dress-code">
+                <h2>Дресс-код</h2>
+                <p>Мы будем рады видеть вас в вечерних нарядах. Предпочтительная цветовая гамма: пастельные тона.</p>
+                <div class="color-palette">
+                    <span style="background-color: #F5EFE6;"></span>
+                    <span style="background-color: #A67B5B;"></span>
+                    <span style="background-color: #B0B0B0;"></span>
+                    <span style="background-color: #A8D0E6;"></span>
+                    <span style="background-color: #1C2E4A;"></span>
+                </div>
+            </div>
+            <hr class="divider">
+            <div class="A_few_words_from_us" id="A_few_words_from_us">
+                <h2>Пара слов от нас</h2>
+                <p><h2>1</h2>Просим обойтись без "Горько!". Мы ценим интимность таких моментов
+                    и предпочитаем делиться ими только друг с другом 😊</p>
+                <p><h2>2</h2>Мы обожаем детей, но этот день мы хотим провести в кругу взрослых.
                     Просим оставить малышей дома и подарить себе вечер отдыха 💫</p>
-                <p>Вместо цветов будем рады вашей улыбке, объятиям и хорошему настроению 🌿</p>
+                <p><h2>3</h2>Вместо цветов дарите нам свои улыбки, объятия и отличное настроение — это создаст настоящую магию вечера!
+                    А если очень хочется что-то принести — пусть это будет бутылочка алкоголя.🌿</p>
             </div>
 
 
@@ -83,13 +121,12 @@
     <section id="location" class="content-section alt-bg">
         <div class="container">
             <h2>Место Проведения</h2>
-            <p>Мы будем ждать вас в ресторане "Донская Роща" по адресу: г. Ростов-на-Дону, ул. Кумженская, 2А.</p>
+            <p>Мы будем ждать вас в ресторане «Донская роща» по адресу: Ростовская область, г. Ростов-на-Дону,  ул. Кумженская, 2А</p>
             <div class="map-container">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2711.193952090537!2d39.61994581582663!3d47.19827267915939!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40e3c6b0bf4dcb27%3A0x49c0ffc73439c354!2z0JTQvtC90YHRgtCw0Y8g0KDQvtGi0LDQoNC4!5e0!3m2!1sru!2sru!4v1701781518862!5m2!1sru!2sru" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3Ab4127d1816f8513608e45e5d5085e23a90cff2e3b52f09175de6ab50442d9de0&amp;source=constructor" width="900" height="450" frameborder="0"></iframe>
             </div>
-            <!-- ЗАМЕНИТЕ src на фото ресторана/места -->
-            <img src="images/venue-photo.jpg" alt="Ресторан Донская Роща" class="venue-photo">
         </div>
+        <img th:src="@{/images/venue-photo.png}" alt="" class="venue-photo" hidden>
     </section>
 
     <section id="story" class="content-section alt-bg">
@@ -119,28 +156,38 @@
         <div class="container">
             <h2>Подтвердите Ваше Присутствие</h2>
             <!-- ЗАМЕНИТЕ ДАТУ RSVP -->
-            <p>Мы будем очень благодарны, если вы сообщите о своем решении до 1 июля 2025 года.</p>
-            <p>Это поможет нам сделать наш праздник идеальным для каждого из вас!</p> 
-            <button id="openRsvpModalBtn" class="button">Подтвердить Присутствие</button>
+            <p>Мы будем очень благодарны, если вы сообщите о своем решении
+                до <span th:text="${#temporals.format(family.confirmationDeadline, 'd MMMM yyyy', new java.util.Locale('ru'))}">*</span> года</p>
 
+            <p>Это поможет нам сделать наш праздник идеальным для каждого из вас!</p>
+
+            <button id="openRsvpModalBtn"
+                    class="button"
+                    th:disabled="${family.isExpiredDeadline}"
+                    th:text="${hasResponded ? 'Изменить ответ' : 'Подтвердить присутствие'}"
+                    th:data-has-responded="${hasResponded}">>Подтвердить Присутствие</button>
+            <p th:if="${family.isExpiredDeadline()}" class="deadline-expired">
+                К сожалению, срок подтверждения истек. Пожалуйста, свяжитесь с нами напрямую.
+            </p>
             <p class="rsvp-manual-contact">
                 Или свяжитесь с нами напрямую:
                 <br>Телефон: <a href="tel:+79604593408">+7 (960) 459-34-08</a> (Дмитрий)
                 <br>Телефон: <a href="tel:+79604593297">+7 (960) 459-32-97</a> (Яна)
-                <br>Email: <a href="mailto:vash_email@example.com">vash_email@example.com</a> <!-- ЗАМЕНИТЕ EMAIL -->
-            </p>
-            
-            <p class="wishlist-info">
-                <!-- Отредактируйте или удалите этот блок по желанию -->
-                Если вы захотите нас поздравить, для нас лучшим подарком будет ваше присутствие!
-                <br>Если все же решите сделать подарок, мы были бы рады [валюте/вкладу в свадебное путешествие/др.] в конверте.
-            </p>
+                <br><a href="https://t.me/+JgrSLFoLiLswMjNi">Группа Telegram</a>
+                <br><img src="images/qr.png" alt="telegram" class="venue-photo">
         </div>
     </section>
 
-    <!-- Футер -->
+    <div id="music-hint-arrow" class="music-hint hidden">
+        <span>Включите<br>музыку</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M50,0 Q60,20 50,40 Q40,60 50,80" stroke-width="5" fill="none" class="arrow-line"/>
+            <path d="M40,70 L50,80 L60,70" stroke-width="5" fill="none" class="arrow-head"/>
+        </svg>
+    </div>
+
     <footer>
-        <p class="footer-names">Дмитрий &amp; Яна</p>
+        <p class="footer-names">Дмитрий и Яна</p>
         <p>&copy; <span id="currentYear"></span>. С любовью и нетерпением ждем нашей встречи!</p>
     </footer>
 <!-- Модальное окно 1: Количество гостей и телефон -->
@@ -149,9 +196,13 @@
             <span class="close-button" id="closeModal1Btn">×</span>
             <h2>Подтверждение Присутствия</h2>
             <form id="rsvpForm1">
-                <div class="form-group">
+                <div id="guest-limit-data"
+                     th:attr="data-max-guests=${family.maxAvailableGuestCount}"
+                     style="display:none;">
+                </div>
+                <div class="form-group" th:hidden="${family.maxAvailableGuestCount==1}">
                     <label for="guestCount">Сколько вас будет (включая вас)?</label>
-                    <input type="number" id="guestCount" name="guestCount" min="1" value="1" required>
+                    <input type="number" id="guestCount" name="guestCount" min="1" value="1">
                 </div>
                 <div class="form-group">
                     <label for="contactPhone">Ваш контактный номер телефона:</label>
@@ -167,16 +218,28 @@
     <div id="rsvpModal2" class="modal">
         <div class="modal-content">
             <span class="close-button" id="closeModal2Btn">×</span>
-            <h2>Информация о Гостях</h2>
+            <h2>Информация о <span th:text="${family.maxAvailableGuestCount>1} ? 'Гостях' : 'Госте'"></span></h2>
             <form id="rsvpForm2">
                 <div id="guestDetailsContainer">
                     <!-- Сюда будут добавляться поля для каждого гостя -->
                 </div>
-                <p class="drink-preference-note">Пожалуйста, укажите предпочтения по напиткам для каждого гостя. Это поможет нам лучше подготовиться. Можно выбрать несколько вариантов.</p>
+                <p class="drink-preference-note">Пожалуйста, укажите предпочтения по напиткам<span th:if="${family.maxAvailableGuestCount>1}"> для каждого гостя</span>. Это поможет нам лучше подготовиться. Можно выбрать несколько вариантов.</p>
                 <button type="submit" class="button">Отправить Подтверждение</button>
             </form>
         </div>
     </div>
+
+    <!-- Модальное окно 3: Подтверждение успешно отправлено -->
+    <div id="rsvpModal3" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModal3Btn">×</span>
+            <h2>Спасибо!</h2>
+            <p>Ваше подтверждение и предпочтения приняты.<br>Мы с нетерпением ждем встречи с вами!</p>
+            <button id="closeModal3Btn2" class="button">Закрыть</button>
+        </div>
+    </div>
     <script th:src="@{/js/script.js}"></script>
+    <script th:src="@{/js/heart-script.js}"></script>
+    <script th:src="@{/js/audio-player.js}"></script>
 </body>
 </html>

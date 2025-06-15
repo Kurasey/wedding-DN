@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Вход в систему</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: #f8f9fa;
+    }
+    .login-form {
+        width: 100%;
+        max-width: 330px;
+        padding: 15px;
+        margin: auto;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,.1);
+    }
+  </style>
+</head>
+<body>
+<div class="login-form text-center">
+  <form th:action="@{/perform_login}" method="post">
+    <h1 class="h3 mb-3 font-weight-normal">Вход в админ-панель</h1>
+
+    <div th:if="${param.error}" class="alert alert-danger" role="alert" th:text="${errorMessage ?: 'Неверные учетные данные'}">
+      Неверные учетные данные
+    </div>
+    <div th:if="${param.logout}" class="alert alert-success" role="alert" th:text="${logoutMessage ?: 'Вы вышли из системы'}">
+      Вы вышли из системы
+    </div>
+
+    <div class="form-group">
+      <label for="username" class="sr-only">Имя пользователя</label>
+      <input type="text" id="username" name="username" class="form-control" placeholder="Имя пользователя" required autofocus>
+    </div>
+    <div class="form-group">
+      <label for="password" class="sr-only">Пароль</label>
+      <input type="password" id="password" name="password" class="form-control" placeholder="Пароль" required>
+    </div>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
+    <p class="mt-5 mb-3 text-muted">© Wedding Invitation Admin</p>
+  </form>
+</div>
+</body>
+</html>

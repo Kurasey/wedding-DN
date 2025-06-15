@@ -1,16 +1,29 @@
 package io.github.kurasey.wedding_invitation.model;
 
+import java.util.Arrays;
+
 public enum Beverage {
-    DRY_WET_WINE("Белое сухое вино"), SEMI_SWEET_RED_WINE ("Красное полуслакое вино"), COGNAC ("Коньяк"),
-    VODKA ("Водка"), SOFT_DRINKS ("Безалкогольные напитки");
+    DRY_WHITE_WINE("Белое сухое вино"),
+    SEMI_SWEET_RED_WINE("Красное полусладкое вино"),
+    COGNAC("Коньяк"),
+    VODKA("Водка"),
+    CHAMPAGNE("Шампанское"),
+    NON_ALCOHOLIC("Безалкогольные напитки");
 
-    private final String name;
+    private final String displayName;
 
-    Beverage(String name) {
-        this.name = name;
+    Beverage(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getName() {
-        return name;
+        return displayName;
+    }
+
+    public static Beverage fromDisplayName(String text) {
+        return Arrays.stream(values())
+                .filter(b -> b.displayName.equalsIgnoreCase(text))
+                .findFirst()
+                .orElse(NON_ALCOHOLIC);
     }
 }

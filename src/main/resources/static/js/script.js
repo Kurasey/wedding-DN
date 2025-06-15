@@ -1,3 +1,31 @@
+const burger = document.getElementById('burger');
+const menu = document.getElementById('menu');
+
+function toggleMenu() {
+  menu.classList.toggle('hidden');
+  burger.classList.toggle('hidden');
+}
+
+function closeMenuIfOpen() {
+  if (!menu.classList.contains('hidden')) {
+    menu.classList.add('hidden');
+    burger.classList.toggle('hidden');
+  }
+}
+
+// Открытие/закрытие по кнопке
+burger.addEventListener('click', (e) => {
+  e.stopPropagation(); // чтобы не сработал document click
+  toggleMenu();
+});
+
+// Закрытие при клике вне меню
+document.addEventListener('click', (e) => {
+  if (!menu.contains(e.target) && e.target !== burger) {
+    closeMenuIfOpen();
+  }
+});
+
 // Таймер обратного отсчета
 function startCountdown(targetDate) {
     const countdownElement = document.getElementById('countdown');
@@ -30,7 +58,7 @@ function startCountdown(targetDate) {
     }
 
     const interval = setInterval(updateCountdown, 1000);
-    updateCountdown(); 
+    updateCountdown();
 }
 
 // Установка текущего года в футере
@@ -43,7 +71,7 @@ function setCurrentYear() {
 
 // Плавный скролл для навигации
 function smoothScroll() {
-    const navLinks = document.querySelectorAll('.sticky-nav a');
+    const navLinks = document.querySelectorAll('.sticky-nav a[href^="#"]');
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
@@ -67,10 +95,15 @@ function smoothScroll() {
 // --- Логика для RSVP Модальных окон ---
 function initializeRsvpModals() {
     const openRsvpModalBtn = document.getElementById('openRsvpModalBtn');
+    if (!openRsvpModalBtn) return; // Выход, если кнопки нет
+
     const rsvpModal1 = document.getElementById('rsvpModal1');
     const rsvpModal2 = document.getElementById('rsvpModal2');
+    const rsvpModal3 = document.getElementById('rsvpModal3');
     const closeModal1Btn = document.getElementById('closeModal1Btn');
     const closeModal2Btn = document.getElementById('closeModal2Btn');
+    const closeModal3Btn = document.getElementById('closeModal3Btn');
+    const closeModal3Btn2 = document.getElementById('closeModal3Btn2');
     const rsvpForm1 = document.getElementById('rsvpForm1');
     const rsvpForm2 = document.getElementById('rsvpForm2');
     const guestDetailsContainer = document.getElementById('guestDetailsContainer');
@@ -80,280 +113,225 @@ function initializeRsvpModals() {
 
     const drinkOptionsList = [
         { id: 'cognac', label: 'Коньяк' },
-        { id: 'white_wine_dry', label: 'Вино белое сухое' },
-        { id: 'red_wine_semisweet', label: 'Вино красное полусладкое' },
+        { id: 'white_wine_dry', label: 'Белое сухое вино' },
+        { id: 'red_wine_semisweet', label: 'Красное полусладкое вино' },
         { id: 'vodka', label: 'Водка' },
         { id: 'champagne', label: 'Шампанское' },
-        { id: 'non_alcoholic', label: 'Безалкогольные напитки (соки, вода, лимонады)' }
+        { id: 'non_alcoholic', label: 'Безалкогольные напитки' }
     ];
 
     // Открыть первое модальное окно
-    if (openRsvpModalBtn) {
-        openRsvpModalBtn.onclick = function() {
-            rsvpModal1.style.display = "block";
-            document.body.style.overflow = 'hidden'; // Блокируем скролл основной страницы
-        }
+    openRsvpModalBtn.onclick = function() {
+            const hasResponded = openRsvpModalBtn.dataset.hasResponded === 'true';
+
+            if (hasResponded) {
+                const userConfirmed = confirm(
+                    "Вы уже отправляли ответ. Отправка новой формы полностью заменит предыдущие данные.\n\nПродолжить?"
+                );
+                if (!userConfirmed) {
+                    return;
+                }
+            }
+        rsvpModal1.style.display = "block";
+        document.body.style.overflow = 'hidden';
     }
 
     // Функции закрытия модальных окон
     function closeModal(modal) {
-        if (modal) {
-            modal.style.display = "none";
-        }
-        // Разблокируем скролл только если оба модальных окна закрыты
-        if ((!rsvpModal1 || rsvpModal1.style.display === "none") && 
-            (!rsvpModal2 || rsvpModal2.style.display === "none")) {
+        if (modal) modal.style.display = "none";
+        if (!isAnyModalOpen()) {
             document.body.style.overflow = 'auto';
         }
     }
 
-    if (closeModal1Btn) {
-        closeModal1Btn.onclick = function() {
-            closeModal(rsvpModal1);
-        }
-    }
-    if (closeModal2Btn) {
-        closeModal2Btn.onclick = function() {
-            closeModal(rsvpModal2);
-        }
+    function isAnyModalOpen() {
+        return (rsvpModal1 && rsvpModal1.style.display === "block") ||
+               (rsvpModal2 && rsvpModal2.style.display === "block") ||
+               (rsvpModal3 && rsvpModal3.style.display === "block");
     }
 
-    // Закрыть модальные окна по клику вне их контента
-    window.onclick = function(event) {
-        if (event.target == rsvpModal1) {
-            closeModal(rsvpModal1);
-        }
-        if (event.target == rsvpModal2) {
-            closeModal(rsvpModal2);
-        }
+    [closeModal1Btn, closeModal2Btn, closeModal3Btn, closeModal3Btn2].forEach(btn => {
+        if (btn) btn.onclick = () => closeModal(btn.closest('.modal'));
+    });
+
+    window.onclick = (event) => {
+        if (event.target.classList.contains('modal')) closeModal(event.target);
     }
-    // Закрытие по клавише Esc
-    window.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape') {
-            if (rsvpModal1 && rsvpModal1.style.display === 'block') {
-                closeModal(rsvpModal1);
-            }
-            if (rsvpModal2 && rsvpModal2.style.display === 'block') {
-                closeModal(rsvpModal2);
-            }
+    window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && isAnyModalOpen()) {
+             if (rsvpModal1.style.display === 'block') closeModal(rsvpModal1);
+             if (rsvpModal2.style.display === 'block') closeModal(rsvpModal2);
+             if (rsvpModal3.style.display === 'block') closeModal(rsvpModal3);
         }
     });
 
-
     // Обработка первой формы RSVP
-    if (rsvpForm1) {
-        rsvpForm1.onsubmit = function(event) {
-            event.preventDefault();
-            currentGuestCount = parseInt(document.getElementById('guestCount').value);
-            currentContactPhone = document.getElementById('contactPhone').value;
+    const guestLimitElement = document.getElementById('guest-limit-data');
+    const maxGuests = guestLimitElement ? parseInt(guestLimitElement.dataset.maxGuests, 10) : 1;
+    const guestCountInput = document.getElementById('guestCount');
+    if (guestCountInput) {
+        guestCountInput.max = maxGuests;
+    }
 
-            if (currentGuestCount > 0 && currentGuestCount <= 10 && currentContactPhone) { // Ограничение на 10 гостей для примера
-                closeModal(rsvpModal1);
-                populateGuestDetailsForm(currentGuestCount);
-                rsvpModal2.style.display = "block";
-                document.body.style.overflow = 'hidden'; // Убедимся, что скролл заблокирован
-            } else if (currentGuestCount > 10) {
-                alert("Пожалуйста, укажите не более 10 гостей. Для большего количества свяжитесь с нами напрямую.");
-            }
-            else {
-                alert("Пожалуйста, заполните все поля корректно.");
-            }
+    rsvpForm1.onsubmit = function(event) {
+        event.preventDefault();
+        currentContactPhone = document.getElementById('contactPhone').value;
+        currentGuestCount = guestCountInput ? parseInt(guestCountInput.value, 10) : 1;
+
+        if (currentGuestCount > 0 && currentGuestCount <= maxGuests && currentContactPhone) {
+            closeModal(rsvpModal1);
+            populateGuestDetailsForm(currentGuestCount);
+            rsvpModal2.style.display = "block";
+            document.body.style.overflow = 'hidden';
+        } else if (currentGuestCount > maxGuests) {
+            alert(`Пожалуйста, укажите не более ${maxGuests} гостей. Для большего количества свяжитесь с нами напрямую.`);
+        } else {
+            alert("Пожалуйста, заполните все поля корректно.");
         }
     }
 
     // Генерация полей для информации о гостях
     function populateGuestDetailsForm(count) {
-        guestDetailsContainer.innerHTML = ''; // Очищаем предыдущие поля
-
+        guestDetailsContainer.innerHTML = '';
         for (let i = 1; i <= count; i++) {
             const guestEntryDiv = document.createElement('div');
             guestEntryDiv.classList.add('guest-entry');
-
-            const guestTitle = document.createElement('h4');
-            guestTitle.textContent = (count === 1) ? `Ваши данные` : `Гость ${i}`;
-            guestEntryDiv.appendChild(guestTitle);
-
-            // Поле ФИО
-            const fioFormGroup = document.createElement('div');
-            fioFormGroup.classList.add('form-group');
-            const fioLabel = document.createElement('label');
-            fioLabel.setAttribute('for', `guestName${i}`);
-            fioLabel.textContent = 'ФИО:';
-            const fioInput = document.createElement('input');
-            fioInput.setAttribute('type', 'text');
-            fioInput.setAttribute('id', `guestName${i}`);
-            fioInput.setAttribute('name', `guestName${i}`);
-            fioInput.required = true;
-            fioFormGroup.appendChild(fioLabel);
-            fioFormGroup.appendChild(fioInput);
-            guestEntryDiv.appendChild(fioFormGroup);
-
-            // Поля для напитков
-            const drinksContainer = document.createElement('div');
-            drinksContainer.classList.add('drink-options-container');
-            const drinksHeader = document.createElement('p');
-            drinksHeader.textContent = 'Предпочтения по напиткам:';
-            drinksContainer.appendChild(drinksHeader);
-            
-            const drinksOptionsDiv = document.createElement('div');
-            drinksOptionsDiv.classList.add('drink-options');
-
-            drinkOptionsList.forEach(drink => {
-                const drinkOptionLabel = document.createElement('label');
-                const drinkCheckbox = document.createElement('input');
-                drinkCheckbox.setAttribute('type', 'checkbox');
-                drinkCheckbox.setAttribute('name', `guest${i}_drink_${drink.id}`);
-                drinkCheckbox.setAttribute('value', drink.label); // Отправляем читаемое название
-                
-                drinkOptionLabel.appendChild(drinkCheckbox);
-                drinkOptionLabel.appendChild(document.createTextNode(` ${drink.label}`));
-                drinksOptionsDiv.appendChild(drinkOptionLabel);
-            });
-            drinksContainer.appendChild(drinksOptionsDiv);
-            guestEntryDiv.appendChild(drinksContainer);
-
+            guestEntryDiv.innerHTML = `
+                <h4>${count === 1 ? 'Ваши данные' : `Гость ${i}`}</h4>
+                <div class="form-group">
+                    <label for="guestName${i}">ФИО:</label>
+                    <input type="text" id="guestName${i}" name="guestName${i}" required>
+                </div>
+                <div class="drink-options-container">
+                    <p>Предпочтения по напиткам:</p>
+                    <div class="drink-options">
+                        ${drinkOptionsList.map(drink => `
+                            <label>
+                                <input type="checkbox" name="guest${i}_drink" value="${drink.label}">
+                                ${drink.label}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
             guestDetailsContainer.appendChild(guestEntryDiv);
         }
-        // Фокус на первое поле ФИО
         const firstFioInput = guestDetailsContainer.querySelector('input[type="text"]');
-        if (firstFioInput) {
-            firstFioInput.focus();
-        }
+        if (firstFioInput) firstFioInput.focus();
     }
 
-    // Обработка второй формы RSVP
-    if (rsvpForm2) {
-        rsvpForm2.onsubmit = function(event) {
-            event.preventDefault();
-            
-            const guestsData = [];
-            let allGuestFormsValid = true;
+    // Обработка второй формы RSVP и отправка на сервер
+    rsvpForm2.onsubmit = async function(event) {
+        event.preventDefault();
+        const submitButton = rsvpForm2.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Отправка...';
 
-            for (let i = 1; i <= currentGuestCount; i++) {
-                const guestNameInput = document.getElementById(`guestName${i}`);
-                const guestName = guestNameInput.value.trim();
+        const guestsData = [];
+        let allGuestFormsValid = true;
 
-                if (!guestName) {
-                    alert(`Пожалуйста, укажите ФИО для ${ (currentGuestCount === 1) ? 'вас' : 'Гостя ' + i}.`);
-                    guestNameInput.focus();
-                    allGuestFormsValid = false;
-                    break; 
-                }
-
-                const selectedDrinks = [];
-                document.querySelectorAll(`input[name^="guest${i}_drink_"]:checked`).forEach(checkbox => {
-                    selectedDrinks.push(checkbox.value);
-                });
-
-                guestsData.push({
-                    guestNumber: i,
-                    name: guestName,
-                    drinks: selectedDrinks.length > 0 ? selectedDrinks : ["Не указаны"]
-                });
+        for (let i = 1; i <= currentGuestCount; i++) {
+            const guestNameInput = document.getElementById(`guestName${i}`);
+            const guestName = guestNameInput.value.trim();
+            if (!guestName) {
+                alert(`Пожалуйста, укажите ФИО для ${currentGuestCount === 1 ? 'вас' : `Гостя ${i}`}.`);
+                guestNameInput.focus();
+                allGuestFormsValid = false;
+                break;
             }
+            const selectedDrinks = Array.from(document.querySelectorAll(`input[name="guest${i}_drink"]:checked`))
+                                        .map(cb => cb.value);
+            guestsData.push({ name: guestName, drinks: selectedDrinks });
+        }
 
-            if (allGuestFormsValid) {
-                console.log("--- RSVP Подтверждение ---");
-                console.log("Контактный телефон:", currentContactPhone);
-                console.log("Общее количество гостей:", currentGuestCount);
-                console.log("Информация по гостям:", guestsData);
+        if (allGuestFormsValid) {
+            const rsvpPayload = {
+                contactPhone: currentContactPhone,
+                guests: guestsData
+            };
 
-                // Здесь должна быть логика отправки данных на сервер (AJAX/Fetch)
-                // Пример: sendRsvpData({ phone: currentContactPhone, guests: guestsData });
+            const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const headerName = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-                closeModal(rsvpModal2);
-                alert("Спасибо! Ваше подтверждение и предпочтения приняты.\nМы с нетерпением ждем встречи с вами!");
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            headers[headerName] = token; // Добавляем CSRF токен в заголовки
 
-                // Очистка форм и переменных
-                rsvpForm1.reset();
-                guestDetailsContainer.innerHTML = ''; 
-                currentGuestCount = 0;
-                currentContactPhone = '';
+            const personalLink = window.location.pathname.split('/')[1];
+            try {
+                const response = await fetch(`/${personalLink}/rsvp`, {
+                    method: 'POST',
+                    headers: headers, // Используем обновленные заголовки
+                    body: JSON.stringify(rsvpPayload)
+                });
+
+                if (response.ok) {
+                    closeModal(rsvpModal2);
+                    rsvpModal3.style.display = "block";
+                    openRsvpModalBtn.textContent = "Ваш ответ получен!";
+                    openRsvpModalBtn.disabled = true;
+                    rsvpForm1.reset();
+                    guestDetailsContainer.innerHTML = '';
+                } else {
+                    if (response.status === 403) {
+                         alert('Ошибка безопасности (CSRF). Пожалуйста, обновите страницу и попробуйте снова.');
+                    } else {
+                        const errorData = await response.json();
+                        const errorMessage = Object.values(errorData).join('\n');
+                        alert(`Ошибка валидации:\n${errorMessage}`);
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка отправки RSVP:', error);
+                alert('Произошла ошибка при отправке данных. Пожалуйста, попробуйте снова или свяжитесь с нами напрямую.');
             }
         }
+        submitButton.disabled = false;
+        submitButton.textContent = 'Отправить Подтверждение';
     }
 }
-// Вызываем функцию инициализации модальных окон после загрузки DOM (перенесено в DOMContentLoaded)
+
 
 function initializePreloader() {
     const preloader = document.getElementById('preloader');
     const openEnvelopeImage = document.getElementById('openEnvelopeImage');
     const body = document.body;
+    const PRELOADER_SHOWN_KEY = 'weddingInvitationEnvelopeShown_v1';
 
-        // Ключ для localStorage, чтобы запомнить, что прелоадер уже был показан
-        const PRELOADER_SHOWN_KEY = 'weddingInvitationEnvelopeShown_v1'; // Добавил _v1 для уникальности, если понадобится сбросить для всех
+    if (!preloader || !openEnvelopeImage) return;
 
-    if (!preloader || !openEnvelopeImage) {
-        console.warn("Preloader elements not found. Skipping preloader initialization.");
-        body.classList.remove('preloader-active'); // Убедимся, что скролл разрешен, если нет прелоадера
+    if (sessionStorage.getItem(PRELOADER_SHOWN_KEY)) {
+        preloader.style.display = 'none';
+        body.classList.remove('preloader-active');
         return;
     }
 
-        // Проверяем, был ли прелоадер уже показан этому пользователю
-    if (localStorage.getItem(PRELOADER_SHOWN_KEY)) {
-        // Если да, сразу скрываем его и разблокируем скролл основной страницы
-        preloader.style.display = 'none'; // Сразу скрываем, без анимации
-        body.classList.remove('preloader-active');
-        return; // Выходим из функции, так как прелоадер показывать не нужно
-    }
-    
-
-    // Изначально добавляем класс для блокировки скролла
     body.classList.add('preloader-active');
 
-    openEnvelopeImage.addEventListener('click', () => {
-        preloader.classList.add('preloader-hidden');
-        
-        // Убираем класс блокировки скролла
-        body.classList.remove('preloader-active');
-
-        // Устанавливаем флаг в localStorage, что прелоадер был показан
-        localStorage.setItem(PRELOADER_SHOWN_KEY, 'true');
-
-        // Через некоторое время можно полностью убрать прелоадер из DOM, если нужно
-        setTimeout(() => {
-            if (preloader.parentNode) { // Проверяем, существует ли еще элемент в DOM
-                 preloader.style.display = 'none'; // Для гарантии, если transition не сработает
-            }
-        }, 700); // Должно быть равно или больше времени transition в CSS (opacity 0.7s)
-    });
-
-    // Обработка случая, если изображение конверта не загрузилось
-    openEnvelopeImage.onerror = function() {
-        console.error("Failed to load envelope image for preloader.");
-        // Можно скрыть прелоадер и разблокировать скролл, если картинка не загрузилась
+    const hidePreloader = () => {
         preloader.classList.add('preloader-hidden');
         body.classList.remove('preloader-active');
-        // Также устанавливаем флаг, чтобы не пытаться показать снова при ошибке
-        localStorage.setItem(PRELOADER_SHOWN_KEY, 'true');
-         setTimeout(() => {
-            if (preloader.parentNode) {
-                 preloader.style.display = 'none';
-            }
-        }, 700);
+        sessionStorage.setItem(PRELOADER_SHOWN_KEY, 'true');
+        setTimeout(() => { preloader.style.display = 'none'; }, 700);
+    };
+
+    openEnvelopeImage.addEventListener('click', hidePreloader);
+    openEnvelopeImage.onerror = () => {
+        console.error("Failed to load preloader image.");
+        hidePreloader();
     };
 }
 
 // --- ИНИЦИАЛИЗАЦИЯ ---
 document.addEventListener('DOMContentLoaded', () => {
-    initializePreloader(); // <--- ВЫЗЫВАЕМ ПРЕЛОАДЕР ПЕРВЫМ
-    // ❗❗❗ ВАЖНО: Установите ДАТУ и ВРЕМЯ вашей свадьбы! ❗❗❗
-    // Формат: 'Месяц ДД, ГГГГ ЧЧ:ММ:СС' (Месяц на английском)
-    const weddingDateString = 'September 09, 2025 15:00:00'; // <--- ЗАМЕНИТЕ НА ВАШУ ДАТУ И ВРЕМЯ
-    
-    if (weddingDateString === '[ЗАМЕНИТЕ_НА_ДАТУ_СВАДЬБЫ]' || weddingDateString.includes("ЗАМЕНИТЕ") || !new Date(weddingDateString).getTime()) {
-        console.warn("Пожалуйста, установите корректную дату свадьбы в script.js для работы таймера!");
-        const countdownElement = document.getElementById('countdown');
-        if (countdownElement) {
-            countdownElement.innerHTML = "<p style='font-size: 1em; color: yellow;'>Установите дату свадьбы в script.js для таймера</p>";
-        }
-    } else {
-        const weddingDate = new Date(weddingDateString).getTime();
-        startCountdown(weddingDate);
-    }
-    
+    initializePreloader();
+    const weddingDateString = 'September 12, 2025 16:00:00';
+
+    const weddingDate = new Date(weddingDateString).getTime();
+    startCountdown(weddingDate);
+
     setCurrentYear();
     smoothScroll();
-    initializeRsvpModals(); // <--- ДОБАВЬТЕ ЭТУ СТРОКУ
+    initializeRsvpModals();
 });
-

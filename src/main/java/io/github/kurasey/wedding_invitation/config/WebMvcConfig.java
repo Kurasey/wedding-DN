@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    VisitTrackingInterceptor visitTrackingInterceptor;
+    private final VisitTrackingInterceptor visitTrackingInterceptor;
 
     public WebMvcConfig(VisitTrackingInterceptor visitTrackingInterceptor) {
         this.visitTrackingInterceptor = visitTrackingInterceptor;
@@ -16,6 +16,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(visitTrackingInterceptor).addPathPatterns("/{personalLink}/**");
+        registry.addInterceptor(visitTrackingInterceptor).addPathPatterns("/{personalLink}");
     }
 }
