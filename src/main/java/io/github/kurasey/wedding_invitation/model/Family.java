@@ -52,7 +52,6 @@ public class Family {
     private LocalDate confirmationDeadline;
 
     @Min(value = 1, message = "Минимум 1 гость")
-    @Max(value = 10, message = "Максимум 10 гостей")
     private int maxAvailableGuestCount;
 
     public boolean isExpiredDeadline() {

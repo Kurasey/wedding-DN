@@ -8,10 +8,17 @@
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Мы Женимся! | Дмитрий и Яна</title>
+
+    <link rel="preload" as="image" th:href="@{/images/background-hero.jpg}">
+    <link rel="preload" as="style" th:href="@{/styles/style.css}">
+    <link rel="preload" as="image" th:href="@{/images/envelope.png}">
+
     <link rel="stylesheet" th:href="@{/styles/style.css}">
     <link rel="stylesheet" th:href="@{/styles/calendar-style.css}">
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=0dd98714-4259-44b3-962f-2760208f95bb&lang=ru_RU" type="text/javascript"></script>
 </head>
 <body>
 
@@ -68,23 +75,23 @@
                         <h2>План дня</h2>
                         <div class="timeline" id="timeline">
                             <div class="timeline-item">
-                                <img th:src="@{/images/glasses.png}" alt="Фуршет">
+                                <img th:src="@{/images/glasses.png}" alt="Фуршет" loading="lazy">
                                 <div>16:00<br>Сбор гостей</div>
                             </div>
                             <div class="timeline-item">
-                                <img th:src="@{/images/rings.png}" alt="Свадебная церемония">
+                                <img th:src="@{/images/rings.png}" alt="Свадебная церемония" loading="lazy">
                                 <div>16:30<br>Свадебная церемония</div>
                             </div>
                             <div class="timeline-item">
-                                <img th:src="@{/images/plate.png}" alt="Начало банкета">
+                                <img th:src="@{/images/plate.png}" alt="Начало банкета" loading="lazy">
                                 <div>17:00<br>Начало банкета</div>
                             </div>
                             <div class="timeline-item">
-                                <img th:src="@{/images/cake.png}" alt="Торт">
+                                <img th:src="@{/images/cake.png}" alt="Торт" loading="lazy">
                                 <div>21:00<br>Торт</div>
                             </div>
                             <div class="timeline-item">
-                                <img th:src="@{/images/moon.png}" alt="Ночь">
+                                <img th:src="@{/images/moon.png}" alt="Ночь" loading="lazy">
                                 <div>23:00<br>Окончание вечера</div>
                             </div>
                         </div>
@@ -121,12 +128,12 @@
     <section id="location" class="content-section alt-bg">
         <div class="container">
             <h2>Место Проведения</h2>
-            <p>Мы будем ждать вас в ресторане «Донская роща» по адресу: Ростовская область, г. Ростов-на-Дону,  ул. Кумженская, 2А</p>
-            <div class="map-container">
-                <iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3Ab4127d1816f8513608e45e5d5085e23a90cff2e3b52f09175de6ab50442d9de0&amp;source=constructor" width="900" height="450" frameborder="0"></iframe>
-            </div>
+            <p>Мы будем ждать вас в ресторане «Донская роща» по адресу: Ростовская область, г. Ростов-на-Дону, ул. Кумженская, 2А</p>
+
+            <!-- ЗАМЕНА IFRAME НА ЭТОТ DIV -->
+            <div id="map" class="map-container"></div>
         </div>
-        <img th:src="@{/images/venue-photo.png}" alt="" class="venue-photo" hidden>
+        <img th:src="@{/images/venue-photo.png}" alt="" class="venue-photo" hidden loading="lazy">
     </section>
 
     <section id="story" class="content-section alt-bg">
@@ -161,14 +168,21 @@
 
             <p>Это поможет нам сделать наш праздник идеальным для каждого из вас!</p>
 
-            <button id="openRsvpModalBtn"
-                    class="button"
-                    th:disabled="${family.isExpiredDeadline}"
-                    th:text="${hasResponded ? 'Изменить ответ' : 'Подтвердить присутствие'}"
-                    th:data-has-responded="${hasResponded}">>Подтвердить Присутствие</button>
+            <div th:if="${!hasResponded}">
+                <button id="openRsvpModalBtn"
+                        class="button"
+                        th:disabled="${family.isExpiredDeadline()}">Подтвердить Присутствие</button>
+            </div>
+            <div th:if="${hasResponded}">
+                <a th:href="@{'/' + ${family.personalLink} + '/edit'}"
+                   class="button"
+                   th:disabled="${family.isExpiredDeadline()}">Изменить ответ</a>
+            </div>
+
             <p th:if="${family.isExpiredDeadline()}" class="deadline-expired">
                 К сожалению, срок подтверждения истек. Пожалуйста, свяжитесь с нами напрямую.
             </p>
+
             <p class="rsvp-manual-contact">
                 Или свяжитесь с нами напрямую:
                 <br>Телефон: <a href="tel:+79604593408">+7 (960) 459-34-08</a> (Дмитрий)
@@ -238,8 +252,10 @@
             <button id="closeModal3Btn2" class="button">Закрыть</button>
         </div>
     </div>
+
     <script th:src="@{/js/script.js}"></script>
     <script th:src="@{/js/heart-script.js}"></script>
     <script th:src="@{/js/audio-player.js}"></script>
+    <script th:src="@{/js/map-script.js}"></script>
 </body>
 </html>

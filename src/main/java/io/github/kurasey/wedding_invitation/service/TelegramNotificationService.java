@@ -84,7 +84,9 @@ public class TelegramNotificationService {
 
     private String escapeHtml(String text) {
         if (text == null) return "";
-        return text.replace("&", "&").replace("<", "<").replace(">", ">");
+        return text.replace("&", "&")
+                .replace("<", "<")
+                .replace(">", ">");
     }
 
     private static class TelegramMessageRequest {

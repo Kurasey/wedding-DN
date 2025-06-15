@@ -36,10 +36,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain (HttpSecurity httpSecurity) throws Exception{
         httpSecurity
                 .authorizeHttpRequests(registry -> registry
-                        // Явно разрешаем доступ ко всем статическим ресурсам (CSS, JS, изображения, аудио)
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/admin/**")).hasRole("ADMIN")
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).hasRole("ADMIN")
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/{personalLink}/**")).permitAll()
                         .requestMatchers("/**").permitAll()
                 )
                 .formLogin(formLogin -> formLogin

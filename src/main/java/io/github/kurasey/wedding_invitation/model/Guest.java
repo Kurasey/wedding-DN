@@ -36,11 +36,9 @@ public class Guest {
         this.family = family;
         this.name = name;
         this.beverages = beverages;
-        this.willAttend = true;
     }
 
     public Guest() {
-        this.willAttend = true;
     }
 
     public Long getId() { return id; }

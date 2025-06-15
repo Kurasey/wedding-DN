@@ -142,9 +142,10 @@ a:hover {
     margin-top: 30px;
 }
 .countdown-item {
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--bg-light);
+    text-align: center;
     padding: 15px 20px;
-    border-radius: 8px;
+    border-radius: 100px;
     min-width: 80px;
 }
 .countdown-item span:first-child {
@@ -206,7 +207,7 @@ a:hover {
     flex: 1;
     min-width: 280px; /* Для адаптивности */
     background-color: var(--bg-white);
-    padding: 25px;
+    /*padding: 25px;*/
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     border-left: 5px solid var(--secondary-color);
@@ -276,13 +277,17 @@ a:hover {
     box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 
-/* Секция Место (Карта) */
+/* --- Адаптивный контейнер для карты (ИСПРАВЛЕННАЯ ВЕРСИЯ) --- */
 .map-container {
+    width: 100%;
+    height: 450px; /* Задаем фиксированную высоту */
     border-radius: 8px;
-    overflow: hidden;
+    overflow: hidden; /* Это важно, чтобы скрыть "вылезающие" части карты */
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     margin-bottom: 30px;
 }
+
+
 .venue-photo {
     display: block;
     max-width: 100%;
@@ -337,6 +342,10 @@ footer p {
 
 /* Адаптивность */
 @media (max-width: 768px) {
+    body{
+        font-size: 14px;
+    }
+
     h2 { font-size: 2.5em; }
     h3 { font-size: 2em; }
     .couple-names-hero { font-size: 3.5em; }
@@ -349,6 +358,10 @@ footer p {
         width: 100%;
         max-width: 350px; /* Ограничение на мобильных */
         margin-bottom: 20px;
+    }
+
+    .map-container {
+        height: 350px;
     }
 
     .event-info {
@@ -380,7 +393,10 @@ footer p {
 }
 
 @media (max-width: 480px) {
-    .couple-names-hero { font-size: 2.8em; }
+    body{
+        font-size: 14px;
+    }
+    .couple-names-hero { font-size: 2.2em; }
     .wedding-date-hero { font-size: 1.3em; }
     h2 { font-size: 2em; }
     
@@ -752,7 +768,7 @@ body.preloader-active {
 
 .timeline-item {
   padding: 15px;
-  width: 50%;
+  width: 45%;
   margin-bottom: -50px;
   border-radius: 8px;
   position: relative;

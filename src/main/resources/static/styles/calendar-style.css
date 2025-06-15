@@ -39,7 +39,7 @@
     border-radius: 5px;
     background-color: #ffffff;
     position: relative; /* Для позиционирования сердечка */
-    min-height: 50px; /* Минимальная высота ячейки */
+    /*min-height: 50px; *//* Минимальная высота ячейки */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -79,6 +79,10 @@
     z-index: 1;
 }
 
+.heart-svg {
+    transform: scale(1.1); /* Увеличиваем размер на 10% */
+}
+
 
 .heart-path {
     stroke: #fa0606;
@@ -104,4 +108,10 @@
     40% { transform: scale(1); }
     60% { transform: scale(1.15); }
     100% { transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+    .heart-svg {
+        transform: scale(1.3);
+    }
 }

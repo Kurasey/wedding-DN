@@ -17,12 +17,10 @@ import java.util.stream.Collectors;
 public class RsvpService {
 
     private final FamilyRepository familyRepository;
-    private final GuestService guestService;
     private final TelegramNotificationService notificationService;
 
-    public RsvpService(FamilyRepository familyRepository, GuestService guestService, TelegramNotificationService notificationService) {
+    public RsvpService(FamilyRepository familyRepository, TelegramNotificationService notificationService) {
         this.familyRepository = familyRepository;
-        this.guestService = guestService;
         this.notificationService = notificationService;
     }
 
@@ -31,12 +29,14 @@ public class RsvpService {
         Family family = familyRepository.findByPersonalLink(personalLink)
                 .orElseThrow(() -> new NotFoundFamily("Семья с ссылкой " + personalLink + " не найдена."));
 
+        // Проверяем, что это первый ответ. Если гости уже есть, этот метод не должен был вызываться.
+        if (!family.getGuests().isEmpty()) {
+            // В идеале, до этого не должно дойти из-за логики на фронте, но это защитная мера.
+            throw new IllegalStateException("Попытка перезаписать существующих гостей через основной RSVP. Используйте страницу редактирования.");
+        }
+
         family.setPhone(rsvpRequest.getContactPhone());
 
-        family.getGuests().clear();
-        familyRepository.saveAndFlush(family);
-
-        // Собираем имена для уведомления
         StringBuilder guestNamesForNotification = new StringBuilder();
 
         for (GuestDto guestDto : rsvpRequest.getGuests()) {
@@ -53,7 +53,6 @@ public class RsvpService {
 
         familyRepository.save(family);
 
-        // Отправляем уведомление
         notificationService.sendRsvpNotification(
                 family.getName(),
                 rsvpRequest.getGuests().size(),
