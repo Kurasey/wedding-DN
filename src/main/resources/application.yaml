@@ -1,3 +1,34 @@
 spring:
   application:
     name: wedding-invitation
+logging:
+  level:
+    org:
+      springframework:
+        boot:
+          context:
+            properties:
+              bind: DEBUG
+
+
+invitation:
+  groomName: ${GROOM_NAME}
+  brideName: ${BRIDE_NAME}
+  eventDateString: ${EVENT_DATE_STRING}
+  eventDateTime: ${EVENT_DATE_TIME}
+  confirmationDeadline: ${CONFIRMATION_DEADLINE}
+  greetingText: ${GREETING_TEXT}
+  invitationText: ${INVITATION_TEXT}
+  wishesFromCouple: ${WISHES_FROM_COUPLE}
+  venueName: ${VENUE_NAME}
+  venueAddress: ${VENUE_ADDRESS}
+  venueLatitude: ${VENUE_LATITUDE}
+  venueLongitude: ${VENUE_LONGITUDE}
+  mapZoom: ${MAP_ZOOM}
+  groomPhone: ${GROOM_PHONE}
+  groomPhoneDisplay: ${GROOM_PHONE_DISPLAY}
+  bridePhone: ${BRIDE_PHONE}
+  bridePhoneDisplay: ${BRIDE_PHONE_DISPLAY}
+  telegramGroupUrl: ${TELEGRAM_GROUP_URL}
+  dressCodeText: ${DRESS_CODE_TEXT}
+  dressCodePalette: ${DRESS_CODE_PALETTE}

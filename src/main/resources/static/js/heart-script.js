@@ -7,10 +7,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    const year = 2025;
-    const monthJs = 8;
-    const weddingDay = 13;
-
 function generateWeddingCalendar(targetElement, year, monthIndex, highlightDay) {
         const monthName = new Date(year, monthIndex).toLocaleString('ru-RU', { month: 'long' });
         const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();

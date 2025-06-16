@@ -1,20 +1,21 @@
         // Функция ymaps.ready() будет вызвана, когда
         // загрузятся все компоненты API, а также когда будет готово DOM-дерево.
         ymaps.ready(init);
-        function init(){
+function init(){
             // Создание карты.
             var myMap = new ymaps.Map("map", {
-                // Координаты центра карты.
-                center: [47.188151, 39.620141],
-                // Уровень масштабирования.
-                zoom: 13,
+                // Координаты центра карты (из HTML)
+                center: mapCenter,
+                // Уровень масштабирования (из HTML)
+                zoom: mapZoom,
                 // Отключаем лишние кнопки
                 controls: ['zoomControl']
             });
 
             // Создаем метку
             var myPlacemark = new ymaps.Placemark(myMap.getCenter(), {
-                hintContent: 'Ресторан «Донская роща»',
+                // Название места (из HTML)
+                hintContent: mapVenueName,
                 balloonContent: 'Ждем вас здесь!'
             }, {
                 // Опции.

@@ -3,8 +3,8 @@ package io.github.kurasey.wedding_invitation.model;
 import java.util.Arrays;
 
 public enum Beverage {
-    DRY_WHITE_WINE("Белое сухое вино"),
-    SEMI_SWEET_RED_WINE("Красное полусладкое вино"),
+    DRY_WINE("Cухое вино"),
+    SEMI_SWEET_WINE("Полусладкое вино"),
     COGNAC("Коньяк"),
     VODKA("Водка"),
     CHAMPAGNE("Шампанское"),

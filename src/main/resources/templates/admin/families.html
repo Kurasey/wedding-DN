@@ -30,33 +30,45 @@
     <!-- ... сообщения об успехе/ошибке ... -->
 
     <a th:href="@{/admin/families/new}" class="btn btn-success mb-3">Добавить Семью</a>
-    <table class="table table-hover">
-        <thead class="thead-light">
-        <tr>
-            <th>Название</th>
-            <th>Перс. ссылка</th>
-            <th>Дедлайн</th>
-            <th>Гостей</th>
-            <th>Действия</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="family : ${families}" th:classappend="${!family.active} ? 'table-secondary' : ''">
-            <td th:classappend="${family.isExpiredDeadline() and #lists.isEmpty(family.guests)} ? 'problem-family' : ''">
-                <a th:href="@{/admin/families/{id}(id=${family.id})}" th:text="${family.name}">Название семьи</a>
-            </td>
-            <td><a th:href="@{'/' + ${family.personalLink}}" th:text="${family.personalLink}" target="_blank" title="Открыть приглашение">ссылка</a></td>
-            <td th:text="${#temporals.format(family.confirmationDeadline, 'dd.MM.yyyy')}">Дата</td>
-            <td th:text="${#lists.size(family.guests)}">0</td>
-            <td>
-                <a th:href="@{/admin/families/{id}/edit(id=${family.id})}" class="btn btn-sm btn-primary">Ред.</a>
-                <form th:action="@{/admin/families/{id}/delete(id=${family.id})}" method="post" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите удалить семью \'' + [[${family.name}]] + '\'?');">
-                    <button type="submit" class="btn btn-sm btn-danger">Удал.</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="thead-light">
+            <tr>
+                <th>Название</th>
+                <th>Телефон</th>
+                <th>Гостей / Макс.</th>
+                <th>Активна</th>
+                <th>Трансфер</th>
+                <th>Размещение</th>
+                <th>Перс. ссылка</th>
+                <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="family : ${families}" th:classappend="${!family.active} ? 'table-secondary' : ''">
+                <!-- Название семьи (как и было) -->
+                <td th:classappend="${family.isExpiredDeadline() and #lists.isEmpty(family.guests)} ? 'problem-family' : ''">
+                    <a th:href="@{/admin/families/{id}(id=${family.id})}" th:text="${family.name}">Название семьи</a>
+                </td>
+                <td th:text="${family.phone ?: '-'}">Телефон</td>
+                <td th:text="${#lists.size(family.guests)} + ' / ' + ${family.maxAvailableGuestCount}">0 / 2</td>
+                <td>
+            <span th:text="${family.active ? 'Да' : 'Нет'}"
+                  th:classappend="${family.active ? 'text-success' : 'text-danger'}"></span>
+                </td>
+                <td th:text="${family.transferRequired ? 'Да' : 'Нет'}">Нет</td>
+                <td th:text="${family.placementRequired ? 'Да' : 'Нет'}">Нет</td>
+                <td><a th:href="@{'/' + ${family.personalLink}}" th:text="${family.personalLink}" target="_blank" title="Открыть приглашение">ссылка</a></td>
+                <td>
+                    <a th:href="@{/admin/families/{id}/edit(id=${family.id})}" class="btn btn-sm btn-primary">Ред.</a>
+                    <form th:action="@{/admin/families/{id}/delete(id=${family.id})}" method="post" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите удалить семью \'' + [[${family.name}]] + '\'?');">
+                        <button type="submit" class="btn btn-sm btn-danger">Удал.</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 <script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script> <!-- Для иконок, замените your-fontawesome-kit.js -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

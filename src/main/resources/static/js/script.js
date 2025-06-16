@@ -111,15 +111,6 @@ function initializeRsvpModals() {
     let currentGuestCount = 0;
     let currentContactPhone = '';
 
-    const drinkOptionsList = [
-        { id: 'cognac', label: 'Коньяк' },
-        { id: 'white_wine_dry', label: 'Белое сухое вино' },
-        { id: 'red_wine_semisweet', label: 'Красное полусладкое вино' },
-        { id: 'vodka', label: 'Водка' },
-        { id: 'champagne', label: 'Шампанское' },
-        { id: 'non_alcoholic', label: 'Безалкогольные напитки' }
-    ];
-
     // Открыть первое модальное окно
     openRsvpModalBtn.onclick = function() {
             const hasResponded = openRsvpModalBtn.dataset.hasResponded === 'true';
@@ -207,8 +198,8 @@ function initializeRsvpModals() {
                     <div class="drink-options">
                         ${drinkOptionsList.map(drink => `
                             <label>
-                                <input type="checkbox" name="guest${i}_drink" value="${drink.label}">
-                                ${drink.label}
+                                <input type="checkbox" name="guest${i}_drink" value="${drink.displayName}">
+                                ${drink.displayName}
                             </label>
                         `).join('')}
                     </div>
@@ -326,10 +317,12 @@ function initializePreloader() {
 // --- ИНИЦИАЛИЗАЦИЯ ---
 document.addEventListener('DOMContentLoaded', () => {
     initializePreloader();
-    const weddingDateString = 'September 12, 2025 16:00:00';
 
-    const weddingDate = new Date(weddingDateString).getTime();
-    startCountdown(weddingDate);
+    // Используем переменную weddingDateTimeISO, определенную в HTML
+    if (typeof weddingDateTimeISO !== 'undefined') {
+        const weddingDate = new Date(weddingDateTimeISO).getTime();
+        startCountdown(weddingDate);
+    }
 
     setCurrentYear();
     smoothScroll();
