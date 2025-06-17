@@ -10,6 +10,8 @@ import io.github.kurasey.wedding_invitation.repository.FamilyRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,15 +31,13 @@ public class RsvpService {
         Family family = familyRepository.findByPersonalLink(personalLink)
                 .orElseThrow(() -> new NotFoundFamily("Семья с ссылкой " + personalLink + " не найдена."));
 
-        // Проверяем, что это первый ответ. Если гости уже есть, этот метод не должен был вызываться.
         if (!family.getGuests().isEmpty()) {
-            // В идеале, до этого не должно дойти из-за логики на фронте, но это защитная мера.
             throw new IllegalStateException("Попытка перезаписать существующих гостей через основной RSVP. Используйте страницу редактирования.");
         }
 
         family.setPhone(rsvpRequest.getContactPhone());
 
-        StringBuilder guestNamesForNotification = new StringBuilder();
+        List<Guest> newGuests = new ArrayList<>();
 
         for (GuestDto guestDto : rsvpRequest.getGuests()) {
             Set<Beverage> beverages = guestDto.getDrinks().stream()
@@ -47,16 +47,11 @@ public class RsvpService {
             Guest guest = new Guest(family, guestDto.getName(), beverages);
             guest.setWillAttend(true);
             family.getGuests().add(guest);
-
-            guestNamesForNotification.append("- ").append(guestDto.getName()).append("\n");
+            newGuests.add(guest);
         }
 
         familyRepository.save(family);
 
-        notificationService.sendRsvpNotification(
-                family.getName(),
-                rsvpRequest.getGuests().size(),
-                guestNamesForNotification.toString()
-        );
+        notificationService.sendRsvpNotification(family, newGuests);
     }
 }

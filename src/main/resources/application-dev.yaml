@@ -1,6 +1,8 @@
 spring:
   config:
     import: optional:file:.env[]
+  mvc:
+    throw-exception-if-no-handler-found: true
 admin:
   username: admin
   password: admin

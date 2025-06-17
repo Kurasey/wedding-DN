@@ -18,10 +18,10 @@
         <h1>Семьи</h1>
         <form id="filterForm" th:action="@{/admin/families}" method="get" class="form-inline">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="showProblemOnly" id="showProblemOnly"
-                       th:checked="${showProblemOnly}" onchange="document.getElementById('filterForm').submit()">
-                <label class="form-check-label" for="showProblemOnly">
-                    Показать только семьи, не ответившие после дедлайна
+                <input class="form-check-input" type="checkbox" name="showUnconfirmedOnly" id="showUnconfirmedOnly"
+                       th:checked="${showUnconfirmedOnly}" onchange="document.getElementById('filterForm').submit()">
+                <label class="form-check-label" for="showUnconfirmedOnly">
+                    Только не подтвердившие присутствие
                 </label>
             </div>
         </form>
@@ -46,8 +46,7 @@
             </thead>
             <tbody>
             <tr th:each="family : ${families}" th:classappend="${!family.active} ? 'table-secondary' : ''">
-                <!-- Название семьи (как и было) -->
-                <td th:classappend="${family.isExpiredDeadline() and #lists.isEmpty(family.guests)} ? 'problem-family' : ''">
+                <td th:classappend="${#lists.isEmpty(family.guests) or family.guests.?[willAttend == true].empty} ? 'problem-family' : ''">
                     <a th:href="@{/admin/families/{id}(id=${family.id})}" th:text="${family.name}">Название семьи</a>
                 </td>
                 <td th:text="${family.phone ?: '-'}">Телефон</td>

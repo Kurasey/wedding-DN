@@ -25,7 +25,9 @@
             <div class="card text-white bg-success mb-3">
                 <div class="card-header">Гости</div>
                 <div class="card-body">
-                    <h5 class="card-title">Подтвердили: <span th:text="${stats.confirmedGuests}">0</span> / <span th:text="${stats.totalGuests}">0</span></h5>
+                    <h5 class="card-title">
+                        Подтвердили: <span th:text="${stats.confirmedGuests}">0</span> / <span th:text="${stats.totalGuests}">0</span>
+                    </h5>
                     <a th:href="@{/admin/guests}" class="btn btn-light">Список</a>
                 </div>
             </div>
@@ -35,8 +37,14 @@
             <div class="card text-dark bg-warning mb-3">
                 <div class="card-header">Трансфер</div>
                 <div class="card-body">
-                    <h5 class="card-title">Нужен: <span th:text="${stats.transferRequiredCount}">0</span> семей</h5>
-                    <a th:href="@{/admin/guests(transfer=true)}" class="btn btn-dark">Кто?</a>
+                    <h5 class="card-title">
+                        Семей: <span th:text="${stats.familiesNeedingTransfer}">0</span>
+                    </h5>
+                    <p class="card-text" style="font-size: 0.9rem; margin-top: -10px;">
+                        (<span>Гостей: </span>
+                        <span th:text="${stats.peopleNeedingTransfer}">0</span>)
+                    </p>
+                    <a th:href="@{/admin/guests(transfer=true, attending=true)}" class="btn btn-dark">Кто?</a>
                 </div>
             </div>
         </div>
@@ -45,12 +53,19 @@
             <div class="card text-white bg-info mb-3">
                 <div class="card-header">Размещение</div>
                 <div class="card-body">
-                    <h5 class="card-title">Нужно: <span th:text="${stats.placementRequiredCount}">0</span> семей</h5>
-                    <a th:href="@{/admin/guests(placement=true)}" class="btn btn-light">Кто?</a>
+                    <h5 class="card-title">
+                        Семей: <span th:text="${stats.familiesNeedingPlacement}">0</span>
+                    </h5>
+                    <p class="card-text" style="font-size: 0.9rem; margin-top: -10px;">
+                        (<span>Гостей: </span>
+                        <span th:text="${stats.peopleNeedingPlacement}">0</span>)
+                    </p>
+                    <a th:href="@{/admin/guests(placement=true, attending=true)}" class="btn btn-light">Кто?</a>
                 </div>
             </div>
         </div>
     </div>
+
 
     <h2>Предпочтения по напиткам (среди подтвержденных)</h2>
     <div th:if="${stats.beverageStats.isEmpty()}" class="alert alert-secondary">

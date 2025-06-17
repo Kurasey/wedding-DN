@@ -7,6 +7,7 @@ import io.github.kurasey.wedding_invitation.repository.FamilyRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +39,6 @@ public class FamilyService {
 
     @Transactional
     public Family createFamily(Family family) {
-        // Проверяем, что ссылка не задана или является пустой строкой
         if (family.getPersonalLink() == null || family.getPersonalLink().isBlank()) {
             family.setPersonalLink(codeGenerator.nextUniqueCode());
         }
@@ -89,5 +89,13 @@ public class FamilyService {
     public List<Guest> getFamilyGuests(Long familyId) {
         Family family = getFamilyById(familyId);
         return family.getGuests() != null ? family.getGuests() : Collections.emptyList();
+    }
+
+    public List<Family> findProblemFamilies(LocalDate date) {
+        return familyRepository.findProblemFamilies(date);
+    }
+
+    public List<Family> findFamiliesWithNoConfirmedGuests() {
+        return familyRepository.findFamiliesWithNoConfirmedGuests();
     }
 }

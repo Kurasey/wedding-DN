@@ -30,7 +30,7 @@
     <header id="hero">
         <div class="hero-content">
 	    <p class="save-the-date"></p>
-            <h1 class="couple-names-hero" th:text="${invitation.groomName} + 'и' + ${invitation.brideName}"></h1>
+            <h1 class="couple-names-hero" th:text="${invitation.groomName} + ' и ' + ${invitation.brideName}"></h1>
             <p class="wedding-date-hero" th:text="${invitation.eventDateString}"></p>
             <p class="wedding-date-hero" th:text="${invitation.greetingText}"></p>
         </div>
@@ -185,7 +185,7 @@
     </div>
 
     <footer>
-        <p class="footer-names" th:text="${invitation.groomName} + 'и' + ${invitation.brideName}"></p>
+        <p class="footer-names" th:text="${invitation.groomName} + ' и ' + ${invitation.brideName}"></p>
         <p>&copy; <span id="currentYear"></span>. С любовью и нетерпением ждем нашей встречи!</p>
     </footer>
 <!-- Модальное окно 1: Количество гостей и телефон -->

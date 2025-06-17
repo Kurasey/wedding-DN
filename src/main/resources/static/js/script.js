@@ -260,8 +260,15 @@ function initializeRsvpModals() {
                 if (response.ok) {
                     closeModal(rsvpModal2);
                     rsvpModal3.style.display = "block";
-                    openRsvpModalBtn.textContent = "Ваш ответ получен!";
-                    openRsvpModalBtn.disabled = true;
+                    document.body.style.overflow = 'hidden';
+                    const openRsvpModalBtn = document.getElementById('openRsvpModalBtn');
+                    if (openRsvpModalBtn) {
+                        const editButton = document.createElement('a');
+                        editButton.href = `/${personalLink}/edit`;
+                        editButton.className = 'button';
+                        editButton.textContent = 'Изменить ответ';
+                        openRsvpModalBtn.parentNode.replaceChild(editButton, openRsvpModalBtn);
+                    }
                     rsvpForm1.reset();
                     guestDetailsContainer.innerHTML = '';
                 } else {

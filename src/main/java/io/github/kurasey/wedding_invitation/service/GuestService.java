@@ -6,8 +6,10 @@ import io.github.kurasey.wedding_invitation.model.Family;
 import io.github.kurasey.wedding_invitation.model.Guest;
 import io.github.kurasey.wedding_invitation.repository.FamilyRepository;
 import io.github.kurasey.wedding_invitation.repository.GuestRepository;
+import jakarta.persistence.criteria.Join;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -50,51 +52,62 @@ public class GuestService {
     }
 
     public List<Guest> findWithFilters(Boolean attending, Boolean transfer, Boolean placement) {
-        List<Guest> guests = findAllOrderByFamily();
+        Specification<Guest> spec = Specification.where(null);
 
         if (attending != null) {
-            guests = guests.stream().filter(g -> g.isWillAttend() == attending).collect(Collectors.toList());
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("willAttend"), attending));
         }
         if (transfer != null) {
-            guests = guests.stream().filter(g -> g.getFamily().isTransferRequired() == transfer).collect(Collectors.toList());
+            // Создаем join с семьей для фильтрации
+            spec = spec.and((root, query, cb) -> {
+                Join<Guest, Family> familyJoin = root.join("family");
+                return cb.equal(familyJoin.get("transferRequired"), transfer);
+            });
         }
         if (placement != null) {
-            guests = guests.stream().filter(g -> g.getFamily().isPlacementRequired() == placement).collect(Collectors.toList());
+            spec = spec.and((root, query, cb) -> {
+                Join<Guest, Family> familyJoin = root.join("family");
+                return cb.equal(familyJoin.get("placementRequired"), placement);
+            });
         }
-
-        return guests;
+        return guestRepository.findAll(spec);
     }
 
     public Map<String, Object> getDashboardStats() {
-        List<Guest> allGuests = findAll();
-        long confirmedGuestsCount = allGuests.stream().filter(Guest::isWillAttend).count();
+        List<Guest> confirmedGuests = guestRepository.findAllConfirmedWithFamily();
 
-        // Получаем уникальные семьи, у которых есть хотя бы один подтвержденный гость
-        Set<Family> familiesWithConfirmedGuests = allGuests.stream()
-                .filter(Guest::isWillAttend)
-                .map(Guest::getFamily)
-                .collect(Collectors.toSet());
+        List<Guest> guestsNeedingTransfer = confirmedGuests.stream()
+                .filter(g -> g.getFamily().isTransferRequired())
+                .toList();
+        long familiesNeedingTransfer = guestsNeedingTransfer.stream().map(Guest::getFamily).distinct().count();
+        long peopleNeedingTransfer = guestsNeedingTransfer.size();
 
-        long transferRequiredCount = familiesWithConfirmedGuests.stream().filter(Family::isTransferRequired).count();
-        long placementRequiredCount = familiesWithConfirmedGuests.stream().filter(Family::isPlacementRequired).count();
+        List<Guest> guestsNeedingPlacement = confirmedGuests.stream()
+                .filter(g -> g.getFamily().isPlacementRequired())
+                .toList();
+        long familiesNeedingPlacement = guestsNeedingPlacement.stream().map(Guest::getFamily).distinct().count();
+        long peopleNeedingPlacement = guestsNeedingPlacement.size();
 
-        Map<Beverage, Long> beverageStats = allGuests.stream()
-                .filter(Guest::isWillAttend)
+        Map<Beverage, Long> beverageStats = confirmedGuests.stream()
                 .flatMap(guest -> guest.getBeverages().stream())
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-        long totalGuests = allGuests.size();
+        long totalGuests = guestRepository.count();
 
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalGuests", totalGuests);
-        stats.put("confirmedGuests", confirmedGuestsCount);
+        stats.put("confirmedGuests", (long) confirmedGuests.size());
         stats.put("beverageStats", beverageStats);
         stats.put("allBeverages", EnumSet.allOf(Beverage.class));
-        stats.put("transferRequiredCount", transferRequiredCount);
-        stats.put("placementRequiredCount", placementRequiredCount);
+
+        stats.put("familiesNeedingTransfer", familiesNeedingTransfer);
+        stats.put("peopleNeedingTransfer", peopleNeedingTransfer);
+        stats.put("familiesNeedingPlacement", familiesNeedingPlacement);
+        stats.put("peopleNeedingPlacement", peopleNeedingPlacement);
 
         return stats;
     }
+
 
     @Transactional
     public Guest updateGuest(Long guestId, Guest guestDetails) {

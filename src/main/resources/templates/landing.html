@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Приглашение на свадьбу</title>
+    <!-- Используем те же стили, что и в основном приглашении -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* Дополнительные стили для центрирования контента */
+        .landing-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            color: #fff; /* Белый цвет текста, как на фоне */
+            padding: 20px;
+        }
+
+        .landing-content {
+            background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон для читаемости */
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 600px;
+        }
+
+        .landing-content h1 {
+            font-family: 'Marck Script', cursive; /* Красивый шрифт для заголовка */
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .landing-content p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body class="main-background">
+
+<div class="landing-container">
+    <div class="landing-content">
+        <p>
+            Это персональный сайт-приглашение на нашу свадьбу.
+        </p>
+        <p>
+            Пожалуйста, используйте уникальную ссылку, которую вы получили, чтобы получить доступ к вашему приглашению и ответить на него.
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

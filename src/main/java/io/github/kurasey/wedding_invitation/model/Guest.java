@@ -27,11 +27,10 @@ public class Guest {
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "guest_beverages", joinColumns = @JoinColumn(name = "guest_id"))
     @Column(name = "beverage")
-    private Set<Beverage> beverages = new HashSet<>(); // <-- ИЗМЕНЕНО c EnumSet на Set и new HashSet<>()
+    private Set<Beverage> beverages = new HashSet<>();
 
     private boolean willAttend;
 
-    // Конструктор теперь принимает Set<Beverage>
     public Guest(Family family, String name, Set<Beverage> beverages) {
         this.family = family;
         this.name = name;

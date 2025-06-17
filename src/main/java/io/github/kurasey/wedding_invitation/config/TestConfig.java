@@ -2,18 +2,22 @@ package io.github.kurasey.wedding_invitation.config;
 
 import io.github.kurasey.wedding_invitation.model.Family;
 import io.github.kurasey.wedding_invitation.repository.FamilyRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Configuration
 @Profile("dev")
+@PropertySource(value = "file:.env", ignoreResourceNotFound = true)
 public class TestConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(TestConfig.class);
 
     @Bean
     ApplicationRunner runner(FamilyRepository repository, InvitationParametersHolder parametersHolder) {
@@ -24,7 +28,7 @@ public class TestConfig {
             grandM.setMaxAvailableGuestCount(1);
             repository.save(parents);
             repository.save(grandM);
-            System.err.println("Test profile");
+            logger.info("Initialized test data for 'dev' profile.");
         };
     }
 }

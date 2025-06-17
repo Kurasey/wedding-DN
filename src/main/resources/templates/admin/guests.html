@@ -42,7 +42,8 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="guest : ${guests}" th:classappend="${!guest.willAttend} ? 'table-secondary' : ''">
+        <tr th:each="guest : ${guests}"
+            th:classappend="${!guest.willAttend or !guest.family.active} ? 'table-secondary' : ''">
             <td th:text="${guest.name}">Имя Гостя</td>
             <td><a th:href="@{/admin/families/{id}(id=${guest.family.id})}" th:text="${guest.family.name}">Семья</a></td>
             <td><span th:text="${guest.willAttend ? 'Да' : 'Нет'}" th:classappend="${guest.willAttend ? 'text-success' : 'text-danger'}"></span></td>

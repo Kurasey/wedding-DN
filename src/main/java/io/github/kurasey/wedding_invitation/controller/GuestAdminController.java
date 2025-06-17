@@ -1,11 +1,13 @@
 package io.github.kurasey.wedding_invitation.controller;
 
 import io.github.kurasey.wedding_invitation.exception.NotFoundGuestException;
+import io.github.kurasey.wedding_invitation.model.ActionSource;
 import io.github.kurasey.wedding_invitation.model.Beverage;
 import io.github.kurasey.wedding_invitation.model.Family;
 import io.github.kurasey.wedding_invitation.model.Guest;
 import io.github.kurasey.wedding_invitation.service.FamilyService;
 import io.github.kurasey.wedding_invitation.service.GuestService;
+import io.github.kurasey.wedding_invitation.service.TelegramNotificationService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,10 +23,12 @@ public class GuestAdminController {
 
     private final GuestService guestService;
     private final FamilyService familyService;
+    private final TelegramNotificationService notificationService;
 
-    public GuestAdminController(GuestService guestService, FamilyService familyService) {
+    public GuestAdminController(GuestService guestService, FamilyService familyService, TelegramNotificationService notificationService) {
         this.guestService = guestService;
         this.familyService = familyService;
+        this.notificationService = notificationService;
     }
 
     @ModelAttribute("family")
@@ -53,10 +57,14 @@ public class GuestAdminController {
                            BindingResult result,
                            RedirectAttributes redirectAttributes, Model model) {
         if (result.hasErrors()) {
-            addCommonAttributes(model); // <-- ДОБАВЛЕНО
+            addCommonAttributes(model);
             return "admin/guest-form";
         }
         familyService.addGuestToFamily(familyId, guest);
+
+        // --- Уведомление о добавлении ---
+        notificationService.sendGuestAddedNotification(findFamily(familyId), guest, ActionSource.ADMIN);
+
         redirectAttributes.addFlashAttribute("successMessage", "Гость '" + guest.getName() + "' успешно добавлен.");
         return "redirect:/admin/families/" + familyId;
     }
@@ -82,9 +90,21 @@ public class GuestAdminController {
             guestDetails.setFamily(findFamily(familyId));
             return "admin/guest-form";
         }
+
+        // Получаем старое состояние гостя для сравнения
+        Guest oldGuest = guestService.findById(guestId)
+                .orElseThrow(() -> new NotFoundGuestException("Гость с ID " + guestId + " не найден"));
+        boolean oldStatus = oldGuest.isWillAttend();
+
         guestDetails.setId(guestId);
         guestDetails.setFamily(findFamily(familyId));
-        guestService.save(guestDetails);
+        Guest updatedGuest = guestService.save(guestDetails);
+
+        // --- Уведомление об изменении статуса ---
+        if (oldStatus != updatedGuest.isWillAttend()) {
+            notificationService.sendGuestStatusChangedNotification(updatedGuest.getFamily(), updatedGuest, ActionSource.ADMIN);
+        }
+
         redirectAttributes.addFlashAttribute("successMessage", "Данные гостя '" + guestDetails.getName() + "' обновлены.");
         return "redirect:/admin/families/" + familyId;
     }
@@ -93,7 +113,17 @@ public class GuestAdminController {
     public String deleteGuest(@PathVariable("familyId") Long familyId,
                               @PathVariable("guestId") Long guestId,
                               RedirectAttributes redirectAttributes) {
+        // Получаем гостя ПЕРЕД удалением, чтобы знать его имя
+        Guest guestToRemove = guestService.findById(guestId)
+                .orElseThrow(() -> new NotFoundGuestException("Гость с ID " + guestId + " не найден для удаления."));
+        String guestName = guestToRemove.getName();
+        Family family = guestToRemove.getFamily();
+
         familyService.removeGuestFromFamily(familyId, guestId);
+
+        // --- Уведомление об удалении ---
+        notificationService.sendGuestRemovedNotification(family, guestName, ActionSource.ADMIN);
+
         redirectAttributes.addFlashAttribute("successMessage", "Гость удален.");
         return "redirect:/admin/families/" + familyId;
     }

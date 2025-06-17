@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,7 +33,7 @@ public class GlobalExceptionHandler {
         }
     }
 
-    @ExceptionHandler(NotFoundFamily.class)
+    /*@ExceptionHandler(NotFoundFamily.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleNotFoundFamily(NotFoundFamily ex, Model model, HttpServletRequest request) {
         logger.warn("Family not found: {}", ex.getMessage());
@@ -47,6 +49,24 @@ public class GlobalExceptionHandler {
         logger.warn("Guest not found: {}", ex.getMessage());
         model.addAttribute("errorMessage", ex.getMessage());
         model.addAttribute("errorStatus", HttpStatus.NOT_FOUND.value());
+        checkAndSetAdminFlag(request, model);
+        return "error/custom-error";
+    }*/
+
+    @ExceptionHandler({NotFoundFamily.class, NoHandlerFoundException.class, NoResourceFoundException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleNotFound(Exception ex, Model model, HttpServletRequest request) {
+        String message;
+        if (ex instanceof NotFoundFamily) {
+            logger.warn("Not found by personal link: {}", ex.getMessage());
+            message = "Приглашение по этой ссылке не найдено. Пожалуйста, проверьте правильность адреса.";
+        } else {
+            logger.warn("Resource or handler not found for [{}]: {}", request.getMethod(), request.getRequestURI());
+            message = "Страница, которую вы ищете, не существует.";
+        }
+
+        model.addAttribute("errorStatus", HttpStatus.NOT_FOUND.value());
+        model.addAttribute("errorMessage", message);
         checkAndSetAdminFlag(request, model);
         return "error/custom-error";
     }

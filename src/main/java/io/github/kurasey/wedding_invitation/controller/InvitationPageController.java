@@ -1,6 +1,7 @@
 package io.github.kurasey.wedding_invitation.controller;
 
 import io.github.kurasey.wedding_invitation.config.InvitationParametersHolder;
+import io.github.kurasey.wedding_invitation.exception.NotFoundFamily;
 import io.github.kurasey.wedding_invitation.model.Beverage;
 import io.github.kurasey.wedding_invitation.model.Family;
 import io.github.kurasey.wedding_invitation.service.FamilyService;
@@ -27,6 +28,9 @@ public class InvitationPageController {
     @GetMapping
     public String getInvitationPage(@PathVariable String personalLink, Model model) {
         Family family = familyService.getByPersonalLink(personalLink);
+        if (!family.isActive()){
+            throw new NotFoundFamily("Family with link " + personalLink + " is not active.");
+        }
         model.addAttribute("family", family);
         model.addAttribute("invitation", parametersHolder);
         boolean hasResponded = !family.getGuests().isEmpty();

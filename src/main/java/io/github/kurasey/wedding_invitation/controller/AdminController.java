@@ -2,6 +2,7 @@ package io.github.kurasey.wedding_invitation.controller;
 
 import io.github.kurasey.wedding_invitation.config.InvitationParametersHolder;
 import io.github.kurasey.wedding_invitation.model.Family;
+import io.github.kurasey.wedding_invitation.repository.FamilyRepository;
 import io.github.kurasey.wedding_invitation.service.FamilyService;
 import io.github.kurasey.wedding_invitation.service.GuestService;
 import io.github.kurasey.wedding_invitation.service.VisitHistoryService;
@@ -16,8 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -42,15 +43,15 @@ public class AdminController {
     }
 
     @GetMapping("/families")
-    public String listFamilies(Model model, @RequestParam(defaultValue = "false") boolean showProblemOnly) {
-        List<Family> families = familyService.getAllFamilies();
-        if (showProblemOnly) {
-            families = families.stream()
-                    .filter(f -> f.isExpiredDeadline() && f.getGuests().isEmpty())
-                    .collect(Collectors.toList());
+    public String listFamilies(Model model, @RequestParam(defaultValue = "false", name = "showUnconfirmedOnly") boolean showUnconfirmedOnly) {
+        List<Family> families;
+        if (showUnconfirmedOnly) {
+            families = familyService.findFamiliesWithNoConfirmedGuests();
+        } else {
+            families = familyService.getAllFamilies();
         }
         model.addAttribute("families", families);
-        model.addAttribute("showProblemOnly", showProblemOnly);
+        model.addAttribute("showUnconfirmedOnly", showUnconfirmedOnly);
         model.addAttribute("activePage", "families");
         return "admin/families";
     }
@@ -83,12 +84,12 @@ public class AdminController {
     }
 
     @GetMapping("/families/{id}/edit")
-    public String showEditFamilyForm(@PathVariable("id") Long id, Model model) { // HttpServletRequest убран
+    public String showEditFamilyForm(@PathVariable("id") Long id, Model model) {
         Family family = familyService.getFamilyById(id);
         model.addAttribute("family", family);
         model.addAttribute("pageTitle", "Редактировать семью: " + family.getName());
         model.addAttribute("activePage", "families");
-        model.addAttribute("baseUrl", getBaseUrl()); // <-- ПЕРЕДАЕМ БАЗОВЫЙ URL
+        model.addAttribute("baseUrl", getBaseUrl());
         return "admin/family-form";
     }
 
@@ -101,7 +102,7 @@ public class AdminController {
             familyDetails.setId(id);
             model.addAttribute("pageTitle", "Редактировать семью: " + (familyDetails.getName() != null ? familyDetails.getName() : ""));
             model.addAttribute("activePage", "families");
-            model.addAttribute("baseUrl", getBaseUrl()); // <-- ПЕРЕДАЕМ БАЗОВЫЙ URL ПРИ ОШИБКЕ
+            model.addAttribute("baseUrl", getBaseUrl());
             return "admin/family-form";
         }
         familyService.updateFamily(id, familyDetails);
@@ -116,7 +117,7 @@ public class AdminController {
             familyService.deleteFamily(id);
             redirectAttributes.addFlashAttribute("successMessage", "Семья '" + family.getName() + "' и вся связанная информация успешно удалены!");
         } catch (DataIntegrityViolationException e) {
-            logger.error("Could not delete family with ID {}: {}", id, e.getMessage()); // Добавим лог для отладки
+            logger.error("Could not delete family with ID {}: {}", id, e.getMessage());
             redirectAttributes.addFlashAttribute("errorMessage", "Невозможно удалить семью. Возможно, на нее еще есть ссылки в других частях системы.");
         } catch (Exception e) {
             logger.error("An unexpected error occurred while deleting family with ID {}", id, e);
@@ -129,7 +130,7 @@ public class AdminController {
     public String viewFamilyDetails(@PathVariable("id") Long id, Model model) {
         Family family = familyService.getFamilyById(id);
         model.addAttribute("family", family);
-        model.addAttribute("activePage", "families"); // <-- ДОБАВЛЕНО
+        model.addAttribute("activePage", "families");
         return "admin/family-details";
     }
 
@@ -140,12 +141,9 @@ public class AdminController {
                                 @RequestParam(name = "placement", required = false) Boolean placement) {
 
         model.addAttribute("guests", guestService.findWithFilters(attending, transfer, placement));
-
-        // Для сохранения состояния фильтров в HTML
         model.addAttribute("filterAttending", attending);
         model.addAttribute("filterTransfer", transfer);
         model.addAttribute("filterPlacement", placement);
-
         model.addAttribute("activePage", "guests");
         return "admin/guests";
     }
@@ -168,8 +166,8 @@ public class AdminController {
             model.addAttribute("historyRecords", historyService.findAll());
         }
 
-        model.addAttribute("allFamilies", familyService.getAllFamilies()); // Для выпадающего списка
-        model.addAttribute("selectedFamilyId", familyId); // Для сохранения выбора в фильтре
+        model.addAttribute("allFamilies", familyService.getAllFamilies());
+        model.addAttribute("selectedFamilyId", familyId);
         model.addAttribute("activePage", "history");
         return "admin/history";
     }
