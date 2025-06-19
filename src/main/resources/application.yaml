@@ -14,7 +14,7 @@ logging:
 invitation:
   groomName: ${GROOM_NAME}
   brideName: ${BRIDE_NAME}
-  eventDateString: ${EVENT_DATE_STRING}
+  eventTimeZone: ${EVENT_TIME_ZONE}
   eventDateTime: ${EVENT_DATE_TIME}
   confirmationDeadline: ${CONFIRMATION_DEADLINE}
   greetingText: ${GREETING_TEXT}
@@ -26,9 +26,7 @@ invitation:
   venueLongitude: ${VENUE_LONGITUDE}
   mapZoom: ${MAP_ZOOM}
   groomPhone: ${GROOM_PHONE}
-  groomPhoneDisplay: ${GROOM_PHONE_DISPLAY}
   bridePhone: ${BRIDE_PHONE}
-  bridePhoneDisplay: ${BRIDE_PHONE_DISPLAY}
   telegramGroupUrl: ${TELEGRAM_GROUP_URL}
   dressCodeText: ${DRESS_CODE_TEXT}
   dressCodePalette: ${DRESS_CODE_PALETTE}

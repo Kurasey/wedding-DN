@@ -31,7 +31,8 @@
         <div class="hero-content">
 	    <p class="save-the-date"></p>
             <h1 class="couple-names-hero" th:text="${invitation.groomName} + ' и ' + ${invitation.brideName}"></h1>
-            <p class="wedding-date-hero" th:text="${invitation.eventDateString}"></p>
+            <p class="wedding-date-hero"
+               th:text="${#temporals.format(invitation.eventDateTime, 'd MMMM, yyyy', #locale)}"></p>
             <p class="wedding-date-hero" th:text="${invitation.greetingText}"></p>
         </div>
     </header>

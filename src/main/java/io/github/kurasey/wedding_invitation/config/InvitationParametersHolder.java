@@ -1,11 +1,18 @@
 package io.github.kurasey.wedding_invitation.config;
 
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
+import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,13 +21,16 @@ import java.util.List;
 @ConfigurationProperties(prefix = "invitation")
 public class InvitationParametersHolder {
 
+    private static final Logger logger = LoggerFactory.getLogger(InvitationParametersHolder.class);
+    private static final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+
     // Event Details
     private String groomName;
     private String brideName;
-    private String eventDateString;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private String eventTimeZone;
     private LocalDateTime eventDateTime;
+    private ZonedDateTime actualEventZonedDateTimeWithTimeZone;
     private LocalDate confirmationDeadline;
     private String greetingText;
     private String invitationText;
@@ -35,9 +45,7 @@ public class InvitationParametersHolder {
 
     // Contact Details
     private String groomPhone;
-    private String groomPhoneDisplay;
     private String bridePhone;
-    private String bridePhoneDisplay;
     private String telegramGroupUrl;
 
     // Content Snippets
@@ -60,20 +68,41 @@ public class InvitationParametersHolder {
         this.groomName = groomName;
     }
 
-    public String getEventDateString() {
-        return eventDateString;
-    }
-
-    public void setEventDateString(String eventDateString) {
-        this.eventDateString = eventDateString;
-    }
-
-    public LocalDateTime getEventDateTime() {
-        return eventDateTime;
-    }
-
     public void setEventDateTime(LocalDateTime eventDateTime) {
         this.eventDateTime = eventDateTime;
+    }
+
+    public ZonedDateTime getEventDateTime() {
+        return actualEventZonedDateTimeWithTimeZone;
+    }
+
+    @PostConstruct
+    public void initEventDateTime() {
+        if (this.eventTimeZone == null || this.eventTimeZone.isBlank()) {
+            ZoneId fallbackZone = ZoneId.systemDefault();
+            logger.warn("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            logger.warn("!!! Timezone (`invitation.eventTimeZone`) is not configured. ");
+            logger.warn("!!! Falling back to server's default timezone: {}", fallbackZone);
+            logger.warn("!!! This can lead to incorrect countdown timers if the server is not in the event's timezone.");
+            logger.warn("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            this.actualEventZonedDateTimeWithTimeZone = this.eventDateTime.atZone(fallbackZone);
+        } else {
+            try {
+                this.actualEventZonedDateTimeWithTimeZone = this.eventDateTime.atZone(ZoneId.of(this.eventTimeZone));
+                logger.info("Successfully configured event time in timezone: {}", this.eventTimeZone);
+            } catch (Exception e) {
+                logger.error("!!! Invalid timezone configured: '{}'. Falling back to system default.", this.eventTimeZone, e);
+                this.actualEventZonedDateTimeWithTimeZone = this.eventDateTime.atZone(ZoneId.systemDefault());
+            }
+        }
+    }
+
+    public String getEventTimeZone() {
+        return eventTimeZone;
+    }
+
+    public void setEventTimeZone(String eventTimeZone) {
+        this.eventTimeZone = eventTimeZone;
     }
 
     public LocalDate getConfirmationDeadline() {
@@ -153,11 +182,7 @@ public class InvitationParametersHolder {
     }
 
     public String getGroomPhoneDisplay() {
-        return groomPhoneDisplay;
-    }
-
-    public void setGroomPhoneDisplay(String groomPhoneDisplay) {
-        this.groomPhoneDisplay = groomPhoneDisplay;
+        return formatPhoneNumber(groomPhone);
     }
 
     public String getBridePhone() {
@@ -169,11 +194,7 @@ public class InvitationParametersHolder {
     }
 
     public String getBridePhoneDisplay() {
-        return bridePhoneDisplay;
-    }
-
-    public void setBridePhoneDisplay(String bridePhoneDisplay) {
-        this.bridePhoneDisplay = bridePhoneDisplay;
+        return formatPhoneNumber(bridePhone);
     }
 
     public String getTelegramGroupUrl() {
@@ -205,4 +226,51 @@ public class InvitationParametersHolder {
             this.wishesFromCouple = Arrays.asList(wishes.split("\\s*;\\s*"));
         }
     }
+
+    public String getGroomPhoneHref() {
+        return formatAsHref(groomPhone);
+    }
+
+    public String getBridePhoneHref() {
+        return formatAsHref(this.bridePhone);
+    }
+
+    /**
+     * Форматирует номер в международный стандарт для отображения пользователю.
+     * Например, "89281234567" -> "+7 928 123-45-67"
+     * @param rawPhone исходная строка с номером
+     * @return отформатированная строка или исходная, если парсинг не удался
+     */
+    private String formatPhoneNumber(String rawPhone) {
+        if (rawPhone == null || rawPhone.isBlank()) {
+            return "";
+        }
+        try {
+            // "RU" - это подсказка для библиотеки, из какой страны номер, если он не в международном формате (например, без +7)
+            Phonenumber.PhoneNumber number = phoneUtil.parse(rawPhone, "RU");
+            return phoneUtil.format(number, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
+        } catch (NumberParseException e) {
+            logger.warn("Could not parse phone number '{}'. Returning as is. Reason: {}", rawPhone, e.getMessage());
+            return rawPhone; // Если не смогли распознать, возвращаем как есть
+        }
+    }
+
+    /**
+     * Форматирует номер в стандарт RFC3966 для ссылок tel:
+     * Например, "8 (928) 123-45-67" -> "tel:+79281234567"
+     * @param rawPhone исходная строка с номером
+     * @return строка для href или пустая строка, если парсинг не удался
+     */
+    private String formatAsHref(String rawPhone) {
+        if (rawPhone == null || rawPhone.isBlank()) {
+            return "";
+        }
+        try {
+            Phonenumber.PhoneNumber number = phoneUtil.parse(rawPhone, "RU");
+            return phoneUtil.format(number, PhoneNumberUtil.PhoneNumberFormat.RFC3966); // -> tel:+...
+        } catch (NumberParseException e) {
+            return "tel:" + rawPhone.replaceAll("\\D", ""); // Запасной вариант - просто оставить цифры
+        }
+    }
+
 }
