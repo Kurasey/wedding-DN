@@ -9,24 +9,32 @@ logging:
           context:
             properties:
               bind: DEBUG
-
-
+server:
+  forward-headers-strategy: ${SERVER_FORWARD_HEADERS_STRATEGY:NATIVE}
+  port: ${SERVER_PORT:8080}
+admin:
+  username: ${ADMIN_USER:admin}
+  password: ${ADMIN_PASS:admin}
+telegram:
+  botToken: ${TELEGRAM_BOT_TOKEN}
+  groom-chat-id: ${TELEGRAM_GROOM_CHAT_ID}
+  bride-chat-id: ${TELEGRAM_BRIDE_CHAT_ID}
 invitation:
-  groomName: ${GROOM_NAME}
-  brideName: ${BRIDE_NAME}
-  eventTimeZone: ${EVENT_TIME_ZONE}
-  eventDateTime: ${EVENT_DATE_TIME}
-  confirmationDeadline: ${CONFIRMATION_DEADLINE}
-  greetingText: ${GREETING_TEXT}
-  invitationText: ${INVITATION_TEXT}
-  wishesFromCouple: ${WISHES_FROM_COUPLE}
-  venueName: ${VENUE_NAME}
-  venueAddress: ${VENUE_ADDRESS}
-  venueLatitude: ${VENUE_LATITUDE}
-  venueLongitude: ${VENUE_LONGITUDE}
-  mapZoom: ${MAP_ZOOM}
-  groomPhone: ${GROOM_PHONE}
-  bridePhone: ${BRIDE_PHONE}
-  telegramGroupUrl: ${TELEGRAM_GROUP_URL}
-  dressCodeText: ${DRESS_CODE_TEXT}
-  dressCodePalette: ${DRESS_CODE_PALETTE}
+  groomName: ${GROOM_NAME:Ivan}
+  brideName: ${BRIDE_NAME:Maria}
+  eventTimeZone: ${EVENT_TIME_ZONE:UTC}
+  eventDateTime: ${EVENT_DATE_TIME:2031-01-01T12:00:00}
+  confirmationDeadline: ${CONFIRMATION_DEADLINE:2030-01-01}
+  greetingText: ${GREETING_TEXT:Save the date}
+  invitationText: ${INVITATION_TEXT:Welcome to the out wedding}
+  wishesFromCouple: ${WISHES_FROM_COUPLE:wishes-1;wishes-2;wishes-3}
+  venueName: ${VENUE_NAME:Life}
+  venueAddress: ${VENUE_ADDRESS:Planet Earth}
+  venueLatitude: ${VENUE_LATITUDE:0}
+  venueLongitude: ${VENUE_LONGITUDE:0}
+  mapZoom: ${MAP_ZOOM:0}
+  groomPhone: ${GROOM_PHONE:+12345678900}
+  bridePhone: ${BRIDE_PHONE:+12345678901}
+  telegramGroupUrl: ${TELEGRAM_GROUP_URL:https://t.me/}
+  dressCodeText: ${DRESS_CODE_TEXT:Dress code text}
+  dressCodePalette: ${DRESS_CODE_PALETTE:#F5EFE6,#000000}

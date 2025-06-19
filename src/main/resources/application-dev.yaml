@@ -3,9 +3,3 @@ spring:
     import: optional:file:.env[]
   mvc:
     throw-exception-if-no-handler-found: true
-admin:
-  username: admin
-  password: admin
-telegram:
-  bot-token: 7742685719:AAFZFUK1fso3Xu1a5UeSKXs0T229YeknRt4
-  groom-chat-id: 510437569
