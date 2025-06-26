@@ -10,4 +10,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    base-version: 1
+    clean-disabled: true

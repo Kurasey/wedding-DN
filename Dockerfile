@@ -25,7 +25,7 @@ FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
 # Копируем JAR-файл, собранный на первом этапе
-COPY --from=builder /app/target/wedding-invitation-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=builder /app/target/*.jar app.jar
 
 # Порт, на котором приложение будет работать внутри контейнера
 EXPOSE 8080
