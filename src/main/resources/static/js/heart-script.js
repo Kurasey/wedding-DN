@@ -42,6 +42,9 @@ function generateWeddingCalendar(targetElement, year, monthIndex, highlightDay) 
             }
             html += `<div class="${cellClasses}" data-day="${day}">${dayContent}</div>`;
         }
+       const calendarLinkHref = `${window.location.pathname}/event.ics`;
+       html += `<a href="${calendarLinkHref}" class="calendar-footer-link" download="wedding_event.ics">Добавить в календарь</a>`;
+
         targetElement.innerHTML = html;
     }
 
