@@ -1,7 +1,7 @@
 package io.github.kurasey.wedding_invitation.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest; // <-- ИМПОРТ
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +16,12 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 public class SecurityConfig {
+
+    private final CustomAuthenticationFailureHandler failureHandler;
+
+    public SecurityConfig(CustomAuthenticationFailureHandler failureHandler) {
+        this.failureHandler = failureHandler;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -33,8 +39,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain (HttpSecurity httpSecurity) throws Exception{
-        httpSecurity
+    public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception{
+        http
                 .authorizeHttpRequests(registry -> registry
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/admin/**")).hasRole("ADMIN")
@@ -46,7 +52,7 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .loginProcessingUrl("/perform_login")
                         .defaultSuccessUrl("/admin", true)
-                        .failureUrl("/login?error=true")
+                        .failureHandler(failureHandler)
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -60,9 +66,17 @@ public class SecurityConfig {
                 )
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(
+                                "default-src 'self'; " +
+                                        "script-src 'self' 'unsafe-inline' https://api-maps.yandex.ru https://yandex.st https://*.yandex.net https://yastatic.net https://code.jquery.com https://cdn.jsdelivr.net https://stackpath.bootstrapcdn.com https://kit.fontawesome.com; " +
+                                        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://stackpath.bootstrapcdn.com; " +
+                                        "font-src 'self' https://fonts.gstatic.com; " +
+                                        "img-src 'self' data: https://*.maps.yandex.net https://api-maps.yandex.ru https://yandex.ru; " +
+                                        "connect-src 'self' https://*.api-maps.yandex.ru https://*.yandex.net https://yastatic.net; " +
+                                        "frame-src 'self' https://*.yandex.net;"
+                        ))
                 );
 
-        return httpSecurity.build();
+        return http.build();
     }
-
 }

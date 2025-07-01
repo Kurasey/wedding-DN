@@ -1,5 +1,6 @@
 package io.github.kurasey.wedding_invitation.controller;
 
+import io.github.kurasey.wedding_invitation.exception.RateLimitExceededException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,5 +22,10 @@ public class LoginController {
             model.addAttribute("logoutMessage", "Вы успешно вышли из системы.");
         }
         return "login";
+    }
+
+    @GetMapping("/locked")
+    public String lockedPage() {
+        throw new RateLimitExceededException("Слишком много попыток входа. Пожалуйста, подождите минуту и попробуйте снова.");
     }
 }

@@ -33,25 +33,6 @@ public class GlobalExceptionHandler {
         }
     }
 
-    /*@ExceptionHandler(NotFoundFamily.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleNotFoundFamily(NotFoundFamily ex, Model model, HttpServletRequest request) {
-        logger.warn("Family not found: {}", ex.getMessage());
-        model.addAttribute("errorMessage", ex.getMessage());
-        model.addAttribute("errorStatus", HttpStatus.NOT_FOUND.value());
-        checkAndSetAdminFlag(request, model);
-        return "error/custom-error";
-    }
-
-    @ExceptionHandler(NotFoundGuestException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleNotFoundGuest(NotFoundGuestException ex, Model model, HttpServletRequest request) {
-        logger.warn("Guest not found: {}", ex.getMessage());
-        model.addAttribute("errorMessage", ex.getMessage());
-        model.addAttribute("errorStatus", HttpStatus.NOT_FOUND.value());
-        checkAndSetAdminFlag(request, model);
-        return "error/custom-error";
-    }*/
 
     @ExceptionHandler({NotFoundFamily.class, NoHandlerFoundException.class, NoResourceFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -77,6 +58,16 @@ public class GlobalExceptionHandler {
         logger.error("An unexpected error occurred: ", ex);
         model.addAttribute("errorMessage", "Произошла непредвиденная ошибка на сервере.");
         model.addAttribute("errorStatus", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        checkAndSetAdminFlag(request, model);
+        return "error/custom-error";
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public String handleRateLimitExceeded(RateLimitExceededException ex, Model model, HttpServletRequest request) {
+        logger.warn("Rate limit page triggered for IP {}: {}", request.getRemoteAddr(), ex.getMessage());
+        model.addAttribute("errorStatus", HttpStatus.TOO_MANY_REQUESTS.value());
+        model.addAttribute("errorMessage", ex.getMessage());
         checkAndSetAdminFlag(request, model);
         return "error/custom-error";
     }

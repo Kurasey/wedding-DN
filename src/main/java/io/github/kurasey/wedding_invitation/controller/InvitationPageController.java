@@ -21,7 +21,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/{personalLink}")
+@RequestMapping("/{personalLink:^(?!.*\\.(?:css|js|ico|png|jpg|gif|svg|txt|ics)$).*$}")
 public class InvitationPageController {
 
     private final FamilyService familyService;
