@@ -871,3 +871,12 @@ body.preloader-active {
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
 }
+
+.qr-code-image {
+    display: block;
+    margin: 20px auto 0;
+    max-width: 300px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}

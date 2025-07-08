@@ -173,7 +173,7 @@
                 <br>Телефон: <a th:href="'tel:' + ${invitation.groomPhone}" th:text="${invitation.groomPhoneDisplay}"></a><span th:text="'(' + ${invitation.groomName} + ')'"></span>
                 <br>Телефон: <a th:href="'tel:' + ${invitation.bridePhone}" th:text="${invitation.bridePhoneDisplay}"></a><span th:text="'(' + ${invitation.brideName} + ')'"></span>
                 <br><a th:href="${invitation.telegramGroupUrl}">Группа Telegram</a>
-                <br><img src="images/qr.png" alt="telegram" class="venue-photo">
+                <br><img th:src="@{/qr-code.png}" alt="QR-код для вступления в Telegram-группу" class="qr-code-image">
         </div>
     </section>
 
