@@ -16,12 +16,10 @@ import java.util.List;
 public class FamilyService {
 
     private final FamilyRepository familyRepository;
-    private final GuestService guestService;
     private final FamilyCodeGenerator codeGenerator;
 
-    public FamilyService(FamilyRepository familyRepository, GuestService guestService, FamilyCodeGenerator codeGenerator) {
+    public FamilyService(FamilyRepository familyRepository, FamilyCodeGenerator codeGenerator) {
         this.familyRepository = familyRepository;
-        this.guestService = guestService;
         this.codeGenerator = codeGenerator;
     }
 
@@ -59,6 +57,12 @@ public class FamilyService {
         family.setActive(familyDetails.isActive());
         family.setConfirmationDeadline(familyDetails.getConfirmationDeadline());
         family.setMaxAvailableGuestCount(familyDetails.getMaxAvailableGuestCount());
+        return familyRepository.save(family);
+    }
+
+//    Использовать только для существующих семей
+    @Transactional
+    public Family persist(Family family) {
         return familyRepository.save(family);
     }
 

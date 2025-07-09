@@ -1,5 +1,6 @@
 package io.github.kurasey.wedding_invitation.controller;
 
+import io.github.kurasey.wedding_invitation.controller.dto.GuestDto;
 import io.github.kurasey.wedding_invitation.controller.dto.RsvpRequestDto;
 import io.github.kurasey.wedding_invitation.service.RsvpService;
 import jakarta.validation.Valid;
@@ -11,6 +12,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -43,7 +45,6 @@ public class RsvpController {
                 ));
     }
 
-    // ДОБАВЛЕН НОВЫЙ ОБРАБОТЧИК ДЛЯ ОСТАЛЬНЫХ ОШИБОК
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGenericRestException(Exception ex) {
         logger.error("An error occurred during RSVP processing", ex);
@@ -52,5 +53,11 @@ public class RsvpController {
                 "message", "Произошла внутренняя ошибка на сервере. Пожалуйста, попробуйте позже."
         );
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @GetMapping("/details")
+    public ResponseEntity<List<GuestDto>> getRsvpDetails(@PathVariable String personalLink) {
+        List<GuestDto> guests = rsvpService.getGuestDetailsForFamily(personalLink);
+        return ResponseEntity.ok(guests);
     }
 }

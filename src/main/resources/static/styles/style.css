@@ -429,9 +429,10 @@ footer p {
     width: 100%;
     height: 100%;
     overflow-y: auto; /* Вертикальная прокрутка если контент не влезает */
-    background-color: rgba(0,0,0,0.65); 
+    background-color: rgba(0,0,0,0.65);
     padding-top: 40px; 
     padding-bottom: 40px;
+
 }
 
 .modal-content {
@@ -444,7 +445,8 @@ footer p {
     border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     position: relative;
-    text-align: left; 
+    text-align: left;
+    margin-bottom: 30px;
 }
 
 .modal-content h2 {
@@ -509,6 +511,9 @@ footer p {
     margin-top: 5px;
 }
 
+.form-group .form-check-label {
+    display: inline;
+}
 
 .guest-entry {
     border: 1px solid var(--accent-color);

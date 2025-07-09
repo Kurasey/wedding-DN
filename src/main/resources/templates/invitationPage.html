@@ -153,15 +153,15 @@
 
             <p>Это поможет нам сделать наш праздник идеальным для каждого из вас!</p>
 
-            <div th:if="${!hasResponded}">
+            <div class="rsvp-options">
                 <button id="openRsvpModalBtn"
                         class="button"
-                        th:disabled="${family.isExpiredDeadline()}">Подтвердить Присутствие</button>
-            </div>
-            <div th:if="${hasResponded}">
-                <a th:href="@{'/' + ${family.personalLink} + '/edit'}"
-                   class="button"
-                   th:disabled="${family.isExpiredDeadline()}">Изменить ответ</a>
+                        th:data-has-responded="${hasResponded}"
+                        th:data-personal-link="${family.personalLink}"
+                        th:disabled="${family.isExpiredDeadline()}">
+                    <span th:if="${hasResponded}">Изменить ответ</span>
+                    <span th:unless="${hasResponded}">Подтвердить Присутствие</span>
+                </button>
             </div>
 
             <p th:if="${family.isExpiredDeadline()}" class="deadline-expired">
@@ -189,44 +189,36 @@
         <p class="footer-names" th:text="${invitation.groomName} + ' и ' + ${invitation.brideName}"></p>
         <p>&copy; <span id="currentYear"></span>. С любовью и нетерпением ждем нашей встречи!</p>
     </footer>
-<!-- Модальное окно 1: Количество гостей и телефон -->
-    <div id="rsvpModal1" class="modal">
+<!-- Модальное окно 2: Детали по гостям (ТЕПЕРЬ ЕДИНОЕ ОКНО) -->
+    <div id="rsvpModal2" class="modal">
         <div class="modal-content">
-            <span class="close-button" id="closeModal1Btn">×</span>
+            <span class="close-button" id="closeModal2Btn">×</span>
             <h2>Подтверждение Присутствия</h2>
-            <form id="rsvpForm1">
+            <form id="rsvpForm2">
+                <div class="form-group">
+                    <label for="contactPhone">Ваш контактный номер телефона:</label>
+                    <input type="tel" id="contactPhone" name="contactPhone" placeholder="+7 (XXX) XXX-XX-XX" required
+                           pattern="^(\+|8)[0-9\s\-\(\)]{7,20}$"
+                           th:value="${family.displayPhone}">
+                    <small>Например: +7 (900) 123-45-67</small>
+                </div>
+                <hr>
+                <h3 style="font-family: var(--font-body); font-size: 1.5em; text-align: center; margin-bottom: 20px;">Информация о Гостях</h3>
                 <div id="guest-limit-data"
                      th:attr="data-max-guests=${family.maxAvailableGuestCount}"
                      style="display:none;">
                 </div>
-                <div class="form-group" th:hidden="${family.maxAvailableGuestCount==1}">
-                    <label for="guestCount">Сколько вас будет (включая вас)?</label>
-                    <input type="number" id="guestCount" name="guestCount" min="1" value="1">
-                </div>
-                <div class="form-group">
-                    <label for="contactPhone">Ваш контактный номер телефона:</label>
-                    <input type="tel" id="contactPhone" name="contactPhone" placeholder="+7 (XXX) XXX-XX-XX" required pattern="\+?[0-9\s\(\)-]{10,18}">
-                    <small>Например: +7 (900) 123-45-67</small>
-                </div>
-                <button type="submit" class="button">Далее</button>
-            </form>
-        </div>
-    </div>
 
-    <!-- Модальное окно 2: Детали по гостям -->
-    <div id="rsvpModal2" class="modal">
-        <div class="modal-content">
-            <span class="close-button" id="closeModal2Btn">×</span>
-            <h2>Информация о <span th:text="${family.maxAvailableGuestCount>1} ? 'Гостях' : 'Госте'"></span></h2>
-            <form id="rsvpForm2">
                 <div id="guestDetailsContainer">
                     <!-- Сюда будут добавляться поля для каждого гостя -->
                 </div>
-                <p class="drink-preference-note">Пожалуйста, укажите предпочтения по напиткам<span th:if="${family.maxAvailableGuestCount>1}"> для каждого гостя</span>. Это поможет нам лучше подготовиться. Можно выбрать несколько вариантов.</p>
+                <button type="button" id="addGuestBtn" class="button" style="display: none; background-color: #5a9a5a; margin-top: 15px; margin-bottom: 15px;">Добавить гостя</button>
+                <p class="drink-preference-note">Пожалуйста, укажите предпочтения по напиткам. Это поможет нам лучше подготовиться.</p>
                 <button type="submit" class="button">Отправить Подтверждение</button>
             </form>
         </div>
     </div>
+
 
     <!-- Модальное окно 3: Подтверждение успешно отправлено -->
     <div id="rsvpModal3" class="modal">

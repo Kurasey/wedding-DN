@@ -1,5 +1,8 @@
 package io.github.kurasey.wedding_invitation.model;
 
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -85,7 +88,7 @@ public class Family {
     public String getAppeal() { return appeal; }
     public void setAppeal(String appeal) { this.appeal = appeal; }
     public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+/*    public void setPhone(String phone) { this.phone = phone; }*/
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
     public boolean isTransferRequired() { return transferRequired; }
@@ -105,6 +108,45 @@ public class Family {
         this.visitHistory = visitHistory;
     }
 
+    public void setPhone(String rawPhone) {
+        if (rawPhone == null || rawPhone.isBlank()) {
+            this.phone = null;
+            return;
+        }
+        try {
+            PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+            Phonenumber.PhoneNumber number = phoneUtil.parse(rawPhone, "RU");
+            if (phoneUtil.isValidNumber(number)) {
+                this.phone = phoneUtil.format(number, PhoneNumberUtil.PhoneNumberFormat.E164);
+            } else {
+                this.phone = rawPhone; // Сохраняем как есть, если невалидный
+            }
+        } catch (NumberParseException e) {
+            this.phone = rawPhone;
+        }
+    }
+
+    /**
+     * Возвращает номер телефона, отформатированный для отображения.
+     * Не маппится на колонку в БД (благодаря аннотации @Transient).
+     * @return Красиво отформатированный номер или пустая строка.
+     */
+    @Transient
+    public String getDisplayPhone() {
+        if (this.phone == null || this.phone.isBlank()) {
+            return "";
+        }
+        try {
+            PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+            Phonenumber.PhoneNumber number = phoneUtil.parse(this.phone, "RU");
+            return phoneUtil.format(number, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
+        } catch (NumberParseException e) {
+            // Если в БД по какой-то причине оказался невалидный номер,
+            // просто вернем его как есть.
+            return this.phone;
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -117,4 +159,6 @@ public class Family {
     public int hashCode() {
         return getClass().hashCode();
     }
+
+
 }
