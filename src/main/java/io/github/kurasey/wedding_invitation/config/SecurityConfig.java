@@ -18,9 +18,11 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
 
     private final CustomAuthenticationFailureHandler failureHandler;
+    private final AssetLocations assetLocations;
 
-    public SecurityConfig(CustomAuthenticationFailureHandler failureHandler) {
+    public SecurityConfig(CustomAuthenticationFailureHandler failureHandler, AssetLocations assetLocations) {
         this.failureHandler = failureHandler;
+        this.assetLocations = assetLocations;
     }
 
     @Bean
@@ -66,14 +68,16 @@ public class SecurityConfig {
                 )
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-                        .contentSecurityPolicy(csp -> csp.policyDirectives(
-                                "default-src 'self'; " +
-                                        "script-src 'self' 'unsafe-inline' https://api-maps.yandex.ru https://yandex.st https://*.yandex.net https://yastatic.net https://code.jquery.com https://cdn.jsdelivr.net https://stackpath.bootstrapcdn.com https://kit.fontawesome.com; " +
-                                        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://stackpath.bootstrapcdn.com; " +
-                                        "font-src 'self' https://fonts.gstatic.com; " +
-                                        "img-src 'self' data: https://*.maps.yandex.net https://api-maps.yandex.ru https://yandex.ru; " +
-                                        "connect-src 'self' https://*.api-maps.yandex.ru https://*.yandex.net https://yastatic.net; " +
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(String.join(" ",
+                                        "default-src 'self';",
+                                        "script-src 'self' 'unsafe-inline' https://api-maps.yandex.ru https://yandex.st https://*.yandex.net https://yastatic.net https://code.jquery.com https://cdn.jsdelivr.net https://stackpath.bootstrapcdn.com https://kit.fontawesome.com;",
+                                        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://stackpath.bootstrapcdn.com;",
+                                        "font-src 'self' https://fonts.gstatic.com;",
+                                        "img-src 'self' data: https://*.maps.yandex.net https://api-maps.yandex.ru https://yandex.ru " + assetLocations.getBaseUrl() + ";",
+                                        "media-src 'self' " + assetLocations.getBaseUrl() + ";",
+                                        "connect-src 'self' https://*.api-maps.yandex.ru https://*.yandex.net https://yastatic.net;",
                                         "frame-src 'self' https://*.yandex.net;"
+                                )
                         ))
                 );
 

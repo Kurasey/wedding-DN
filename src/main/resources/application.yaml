@@ -38,3 +38,9 @@ invitation:
   telegramGroupUrl: ${TELEGRAM_GROUP_URL:https://t.me/}
   dressCodeText: ${DRESS_CODE_TEXT:Dress code text}
   dressCodePalette: ${DRESS_CODE_PALETTE:#F5EFE6,#000000}
+
+assets:
+  baseUrl: ${ASSETS_BASE_URL}
+  mainBackground: ${ASSETS_MAIN_BACKGROUND}
+  venuePhoto: ${ASSETS_VENUE_PHOTO}
+  backgroundMusic: ${ASSETS_BACKGROUND_MUSIC}

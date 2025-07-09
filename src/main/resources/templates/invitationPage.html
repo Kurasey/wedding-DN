@@ -8,7 +8,6 @@
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title th:text="'Мы Женимся! | ' + ${invitation.groomName} + ' и ' + ${invitation.brideName}"></title>
-    <link rel="preload" as="image" th:href="@{/images/background-hero.jpg}">
     <link rel="preload" as="style" th:href="@{/styles/style.css}">
     <link rel="preload" as="image" th:href="@{/images/envelope.png}">
 
@@ -28,6 +27,9 @@
 
     <!-- Секция 1: Главный экран (Hero) -->
     <header id="hero">
+        <img th:src="${assetLocations.mainBackground}"
+             alt=""
+             class="hero-background">
         <div class="hero-content">
 	    <p class="save-the-date"></p>
             <h1 class="couple-names-hero" th:text="${invitation.groomName} + ' и ' + ${invitation.brideName}"></h1>
@@ -50,7 +52,7 @@
         <a href="#rsvp">RSVP</a>
     </nav>
 
-    <audio id="audioPlayer" th:src="@{/audio/Christina_Perri_A_Thousand_Years_(Instrumental).mp3}" type="audio/mpeg" loop></audio>
+    <audio id="audioPlayer" th:src="${assetLocations.backgroundMusic}" type="audio/mpeg" loop></audio>
 
     <!-- Секция 2: Приглашение и детали -->
     <section id="invitation-details" class="content-section">
@@ -119,7 +121,7 @@
 
             <div id="map" class="map-container"></div>
         </div>
-        <img th:src="@{/images/venue-photo.png}" alt="" class="venue-photo" hidden loading="lazy">
+        <img th:src="${assetLocations.venuePhoto}" alt="" class="venue-photo" loading="lazy">
     </section>
 
     <section id="story" class="content-section alt-bg">
