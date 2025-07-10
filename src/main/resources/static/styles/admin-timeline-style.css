@@ -1,0 +1,16 @@
+.icon-selector-item {
+            cursor: pointer;
+            padding: 5px;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            transition: all 0.2s ease-in-out;
+        }
+        .icon-selector-item:hover {
+            transform: scale(2);
+            z-index: 10;
+            border-color: #a7cfff;
+        }
+        .icon-selector-item.selected {
+            border-color: #007bff;
+            background-color: #e7f1ff;
+        }

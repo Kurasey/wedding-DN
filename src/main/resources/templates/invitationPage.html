@@ -71,27 +71,16 @@
             <div class="event-info">
                 <div class="event-item">
                     <section class="section-plan">
-                        <h2>План дня</h2>
-                        <div class="timeline" id="timeline">
-                            <div class="timeline-item">
-                                <img th:src="@{/images/glasses.png}" alt="Фуршет" loading="lazy">
-                                <div>16:00<br>Сбор гостей</div>
-                            </div>
-                            <div class="timeline-item">
-                                <img th:src="@{/images/rings.png}" alt="Свадебная церемония" loading="lazy">
-                                <div>16:30<br>Свадебная церемония</div>
-                            </div>
-                            <div class="timeline-item">
-                                <img th:src="@{/images/plate.png}" alt="Начало банкета" loading="lazy">
-                                <div>17:00<br>Начало банкета</div>
-                            </div>
-                            <div class="timeline-item">
-                                <img th:src="@{/images/cake.png}" alt="Торт" loading="lazy">
-                                <div>21:00<br>Торт</div>
-                            </div>
-                            <div class="timeline-item">
-                                <img th:src="@{/images/moon.png}" alt="Ночь" loading="lazy">
-                                <div>23:00<br>Окончание вечера</div>
+                        <h2>План дня<span th:if="${#lists.isEmpty(timelineItems)}"> пока не определен</span> </h2>
+                        <div class="timeline" id="timeline" th:unless="${#lists.isEmpty(timelineItems)}">
+                            <!-- ДИНАМИЧЕСКИЙ БЛОК -->
+                            <div th:each="item : ${timelineItems}" class="timeline-item">
+                                <img th:src="${item.iconName}" th:alt="${item.title}" loading="lazy">
+                                <div>
+                                    <span th:text="${#temporals.format(item.eventTime, 'HH:mm')}"></span>
+                                    <br>
+                                    <span th:text="${item.title}"></span>
+                                </div>
                             </div>
                         </div>
                     </section>

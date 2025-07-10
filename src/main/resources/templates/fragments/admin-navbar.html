@@ -8,13 +8,16 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item" th:classappend="${activePage != null and activePage == 'families'} ? 'active' : ''">
+            <li class="nav-item" th:classappend="${activePage == 'families'} ? 'active' : ''">
                 <a class="nav-link" th:href="@{/admin/families}">Семьи</a>
             </li>
-            <li class="nav-item" th:classappend="${activePage != null and activePage == 'guests'} ? 'active' : ''">
+            <li class="nav-item" th:classappend="${activePage == 'guests'} ? 'active' : ''">
                 <a class="nav-link" th:href="@{/admin/guests}">Гости</a>
             </li>
-            <li class="nav-item" th:classappend="${activePage != null and activePage == 'history'} ? 'active' : ''">
+            <li class="nav-item" th:classappend="${activePage == 'timeline'} ? 'active' : ''">
+                <a class="nav-link" th:href="@{/admin/timeline}">Распорядок</a>
+            </li>
+            <li class="nav-item" th:classappend="${activePage == 'history'} ? 'active' : ''">
                 <a class="nav-link" th:href="@{/admin/history}">История</a>
             </li>
         </ul>

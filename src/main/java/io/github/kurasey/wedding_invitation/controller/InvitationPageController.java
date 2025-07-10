@@ -5,6 +5,7 @@ import io.github.kurasey.wedding_invitation.exception.NotFoundFamily;
 import io.github.kurasey.wedding_invitation.model.Beverage;
 import io.github.kurasey.wedding_invitation.model.Family;
 import io.github.kurasey.wedding_invitation.service.FamilyService;
+import io.github.kurasey.wedding_invitation.service.TimelineItemService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +27,12 @@ public class InvitationPageController {
 
     private final FamilyService familyService;
     private final InvitationParametersHolder parametersHolder;
+    private final TimelineItemService timelineItemService;
 
-    public InvitationPageController(FamilyService familyService, InvitationParametersHolder parametersHolder) {
+    public InvitationPageController(FamilyService familyService, InvitationParametersHolder parametersHolder, TimelineItemService timelineItemService) {
         this.familyService = familyService;
         this.parametersHolder = parametersHolder;
+        this.timelineItemService = timelineItemService;
     }
 
     @GetMapping
@@ -46,6 +49,7 @@ public class InvitationPageController {
                 Arrays.stream(Beverage.values())
                         .map(b -> Map.of("id", b.name(), "displayName", b.getName()))
                         .collect(Collectors.toList()));
+        model.addAttribute("timelineItems", timelineItemService.getAllTimelineItems());
         return "invitationPage";
     }
 
