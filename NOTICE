@@ -1,0 +1,20 @@
+WEMS - Wedding Event Management System
+Copyright 2025 Dmitry Yetskov (Kaurami)
+
+This product includes software developed by
+The Apache Software Foundation (http://www.apache.org/).
+
+This product includes software developed by the Spring Framework
+project (https://spring.io/).
+
+This product includes software developed by the Hibernate
+project (https://hibernate.org/).
+
+This product includes software developed by the Flyway
+project (https://flywaydb.org/).
+
+This product includes software developed by the ZXing
+project (https://github.com/zxing/zxing).
+
+This product includes software developed by the Bucket4j
+project (https://github.com/bucket4j/bucket4j).

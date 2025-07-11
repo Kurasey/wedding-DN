@@ -1,6 +1,6 @@
 spring:
   application:
-    name: wedding-invitation
+    name: wems
 logging:
   level:
     org:
@@ -26,7 +26,7 @@ invitation:
   eventDateTime: ${EVENT_DATE_TIME:2031-01-01T12:00:00}
   confirmationDeadline: ${CONFIRMATION_DEADLINE:2030-01-01}
   greetingText: ${GREETING_TEXT:Save the date}
-  invitationText: ${INVITATION_TEXT:Welcome to the out wedding}
+  invitationText: ${INVITATION_TEXT:Welcome to the our wedding}
   wishesFromCouple: ${WISHES_FROM_COUPLE:wishes-1;wishes-2;wishes-3}
   venueName: ${VENUE_NAME:Life}
   venueAddress: ${VENUE_ADDRESS:Planet Earth}
