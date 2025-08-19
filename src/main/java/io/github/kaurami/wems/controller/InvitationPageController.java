@@ -4,6 +4,7 @@ import io.github.kaurami.wems.config.InvitationParametersHolder;
 import io.github.kaurami.wems.exception.NotFoundFamily;
 import io.github.kaurami.wems.model.Beverage;
 import io.github.kaurami.wems.model.Family;
+import io.github.kaurami.wems.model.TransferOption;
 import io.github.kaurami.wems.service.FamilyService;
 import io.github.kaurami.wems.service.TimelineItemService;
 import org.springframework.http.HttpHeaders;
@@ -49,8 +50,9 @@ public class InvitationPageController {
                 Arrays.stream(Beverage.values())
                         .map(b -> Map.of("id", b.name(), "displayName", b.getName()))
                         .collect(Collectors.toList()));
+        model.addAttribute("allTransferOptions", TransferOption.values());
         model.addAttribute("timelineItems", timelineItemService.getAllTimelineItems());
-        return "invitationPage";
+        return "my-invitation-page";
     }
 
     @GetMapping("/event.ics")

@@ -30,12 +30,6 @@ public interface GuestRepository extends JpaRepository<Guest, Long>, JpaSpecific
     @Query("SELECT count(g) FROM Guest g WHERE g.willAttend = true")
     long countConfirmedGuests();
 
-    @Query("SELECT count(DISTINCT g.family) FROM Guest g WHERE g.willAttend = true AND g.family.transferRequired = true")
-    long countFamiliesRequiringTransfer();
-
-    @Query("SELECT count(DISTINCT g.family) FROM Guest g WHERE g.willAttend = true AND g.family.placementRequired = true")
-    long countFamiliesRequiringPlacement();
-
     @Query("SELECT g.beverages, count(g) FROM Guest g WHERE g.willAttend = true GROUP BY g.beverages")
     List<Object[]> countBeveragePreferences();
 

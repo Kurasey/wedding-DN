@@ -52,7 +52,7 @@ public class FamilyService {
         family.setName(familyDetails.getName());
         family.setAppeal(familyDetails.getAppeal());
         family.setPhone(familyDetails.getPhone());
-        family.setTransferRequired(familyDetails.isTransferRequired());
+        family.setTransferOption(familyDetails.getTransferOption()); // <-- ИЗМЕНЕНИЕ
         family.setPlacementRequired(familyDetails.isPlacementRequired());
         family.setActive(familyDetails.isActive());
         family.setConfirmationDeadline(familyDetails.getConfirmationDeadline());
@@ -60,7 +60,7 @@ public class FamilyService {
         return familyRepository.save(family);
     }
 
-//    Использовать только для существующих семей
+    //    Использовать только для существующих семей
     @Transactional
     public Family persist(Family family) {
         return familyRepository.save(family);

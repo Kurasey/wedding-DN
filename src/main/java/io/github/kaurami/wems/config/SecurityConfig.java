@@ -67,8 +67,8 @@ public class SecurityConfig {
                         .ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**"))
                 )
                 .headers(headers -> headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-                        .contentSecurityPolicy(csp -> csp.policyDirectives(String.join(" ",
+                                .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+                        /*.contentSecurityPolicy(csp -> csp.policyDirectives(String.join(" ",
                                         "default-src 'self';",
                                         "script-src 'self' 'unsafe-inline' https://api-maps.yandex.ru https://yandex.st https://*.yandex.net https://yastatic.net https://code.jquery.com https://cdn.jsdelivr.net https://stackpath.bootstrapcdn.com https://kit.fontawesome.com;",
                                         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://stackpath.bootstrapcdn.com;",
@@ -78,7 +78,7 @@ public class SecurityConfig {
                                         "connect-src 'self' https://*.api-maps.yandex.ru https://*.yandex.net https://yastatic.net;",
                                         "frame-src 'self' https://*.yandex.net;"
                                 )
-                        ))
+                        ))*/
                 );
 
         return http.build();

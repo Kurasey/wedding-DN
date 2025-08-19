@@ -109,6 +109,7 @@ function initializeRsvpModals() {
     const guestDetailsContainer = document.getElementById('guestDetailsContainer');
     const addGuestBtn = document.getElementById('addGuestBtn');
     const contactPhoneInput = document.getElementById('contactPhone');
+    const transferOptionSelect = document.getElementById('transferOption');
 
     const guestLimitElement = document.getElementById('guest-limit-data');
     const maxGuests = guestLimitElement ? parseInt(guestLimitElement.dataset.maxGuests, 10) : 1;
@@ -266,7 +267,8 @@ function initializeRsvpModals() {
         if (allFormsValid) {
             const rsvpPayload = {
                 contactPhone: contactPhoneInput.value,
-                guests: guestsData
+                guests: guestsData,
+                transferOption: transferOptionSelect.value
             };
 
             const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
@@ -278,7 +280,7 @@ function initializeRsvpModals() {
             try {
                 const response = await fetch(`/${personalLink}/rsvp`, {
                     method: 'POST',
-                    headers: headers, // Используем обновленные заголовки
+                    headers: headers,
                     body: JSON.stringify(rsvpPayload)
                 });
 
@@ -288,6 +290,12 @@ function initializeRsvpModals() {
                     document.body.style.overflow = 'hidden';
                     openRsvpModalBtn.dataset.hasResponded = 'true';
                     const buttonTextSpan = openRsvpModalBtn.querySelector('span');
+                    if (shouldAnimate) {
+                            startFireworksShow();
+                            shouldAnimate = false;
+                    }
+                    shouldAnimate = false;
+                    document.getElementById("textAgree").classList.remove("hide");
                     if (buttonTextSpan) buttonTextSpan.textContent = 'Изменить ответ';
                 } else {
                     if (response.status === 403) {
@@ -307,7 +315,7 @@ function initializeRsvpModals() {
             }
         }
         submitButton.disabled = false;
-        submitButton.textContent = 'Отправить Подтверждение';
+        submitButton.textContent = 'Отправить подтверждение';
     };
 }
 

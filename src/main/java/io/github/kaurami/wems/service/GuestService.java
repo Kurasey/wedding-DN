@@ -4,6 +4,7 @@ import io.github.kaurami.wems.exception.NotFoundGuestException;
 import io.github.kaurami.wems.model.Beverage;
 import io.github.kaurami.wems.model.Family;
 import io.github.kaurami.wems.model.Guest;
+import io.github.kaurami.wems.model.TransferOption; // <-- ИМПОРТ
 import io.github.kaurami.wems.repository.FamilyRepository;
 import io.github.kaurami.wems.repository.GuestRepository;
 import jakarta.persistence.criteria.Join;
@@ -57,11 +58,10 @@ public class GuestService {
         if (attending != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("willAttend"), attending));
         }
-        if (transfer != null) {
-            // Создаем join с семьей для фильтрации
+        if (transfer != null && transfer) {
             spec = spec.and((root, query, cb) -> {
                 Join<Guest, Family> familyJoin = root.join("family");
-                return cb.equal(familyJoin.get("transferRequired"), transfer);
+                return cb.notEqual(familyJoin.get("transferOption"), TransferOption.NOT_REQUIRED);
             });
         }
         if (placement != null) {
@@ -75,12 +75,14 @@ public class GuestService {
 
     public Map<String, Object> getDashboardStats() {
         List<Guest> confirmedGuests = guestRepository.findAllConfirmedWithFamily();
+        Map<TransferOption, Long> transferFamiliesStats = confirmedGuests.stream()
+                .map(Guest::getFamily)
+                .distinct()
+                .collect(Collectors.groupingBy(Family::getTransferOption, Collectors.counting()));
 
-        List<Guest> guestsNeedingTransfer = confirmedGuests.stream()
-                .filter(g -> g.getFamily().isTransferRequired())
-                .toList();
-        long familiesNeedingTransfer = guestsNeedingTransfer.stream().map(Guest::getFamily).distinct().count();
-        long peopleNeedingTransfer = guestsNeedingTransfer.size();
+        Map<TransferOption, Long> transferPeopleStats = confirmedGuests.stream()
+                .collect(Collectors.groupingBy(g -> g.getFamily().getTransferOption(), Collectors.counting()));
+
 
         List<Guest> guestsNeedingPlacement = confirmedGuests.stream()
                 .filter(g -> g.getFamily().isPlacementRequired())
@@ -100,8 +102,10 @@ public class GuestService {
         stats.put("beverageStats", beverageStats);
         stats.put("allBeverages", EnumSet.allOf(Beverage.class));
 
-        stats.put("familiesNeedingTransfer", familiesNeedingTransfer);
-        stats.put("peopleNeedingTransfer", peopleNeedingTransfer);
+        stats.put("transferFamiliesStats", transferFamiliesStats);
+        stats.put("transferPeopleStats", transferPeopleStats);
+        stats.put("allTransferOptions", EnumSet.allOf(TransferOption.class));
+
         stats.put("familiesNeedingPlacement", familiesNeedingPlacement);
         stats.put("peopleNeedingPlacement", peopleNeedingPlacement);
 

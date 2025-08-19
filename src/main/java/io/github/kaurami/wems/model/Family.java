@@ -37,8 +37,11 @@ public class Family {
     @Column(name = "is_active")
     private boolean active;
 
-    @Column(name = "is_transfer_required")
-    private boolean transferRequired;
+    // --- ИЗМЕНЕНИЕ ---
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transfer_option")
+    @NotNull(message = "Необходимо указать опцию трансфера")
+    private TransferOption transferOption;
 
     @Column(name = "is_placement_required")
     private boolean placementRequired;
@@ -67,16 +70,19 @@ public class Family {
         this.appeal = appeal;
         this.confirmationDeadline = confirmationDeadline;
         this.active = true;
-        this.maxAvailableGuestCount = 2; // Значение по-умолчанию
+        this.maxAvailableGuestCount = 2;
+        this.transferOption = TransferOption.NOT_REQUIRED;
     }
 
     public Family() {
         this.active = true;
         this.guests = new ArrayList<>();
-        this.maxAvailableGuestCount = 2; // Значение по-умолчанию
+        this.maxAvailableGuestCount = 2;
+        this.transferOption = TransferOption.NOT_REQUIRED;
     }
 
-    // Standard Getters and Setters
+    public TransferOption getTransferOption() { return transferOption; }
+    public void setTransferOption(TransferOption transferOption) { this.transferOption = transferOption; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getVersion() { return version; }
@@ -90,8 +96,6 @@ public class Family {
     public String getPhone() { return phone; }
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
-    public boolean isTransferRequired() { return transferRequired; }
-    public void setTransferRequired(boolean transferRequired) { this.transferRequired = transferRequired; }
     public boolean isPlacementRequired() { return placementRequired; }
     public void setPlacementRequired(boolean placementRequired) { this.placementRequired = placementRequired; }
     public List<Guest> getGuests() { return guests; }
@@ -125,11 +129,6 @@ public class Family {
         }
     }
 
-    /**
-     * Возвращает номер телефона, отформатированный для отображения.
-     * Не маппится на колонку в БД (благодаря аннотации @Transient).
-     * @return Красиво отформатированный номер или пустая строка.
-     */
     @Transient
     public String getDisplayPhone() {
         if (this.phone == null || this.phone.isBlank()) {
@@ -140,8 +139,6 @@ public class Family {
             Phonenumber.PhoneNumber number = phoneUtil.parse(this.phone, "RU");
             return phoneUtil.format(number, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
         } catch (NumberParseException e) {
-            // Если в БД по какой-то причине оказался невалидный номер,
-            // просто вернем его как есть.
             return this.phone;
         }
     }
@@ -158,6 +155,4 @@ public class Family {
     public int hashCode() {
         return getClass().hashCode();
     }
-
-
 }

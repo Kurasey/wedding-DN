@@ -11,7 +11,7 @@
     <h1>Сводная информация</h1>
     <div class="row mt-4">
         <!-- Карточка семей -->
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="card text-white bg-primary mb-3">
                 <div class="card-header">Семьи</div>
                 <div class="card-body">
@@ -21,7 +21,7 @@
             </div>
         </div>
         <!-- Карточка гостей -->
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="card text-white bg-success mb-3">
                 <div class="card-header">Гости</div>
                 <div class="card-body">
@@ -32,24 +32,8 @@
                 </div>
             </div>
         </div>
-        <!-- Карточка трансфера -->
-        <div class="col-md-3">
-            <div class="card text-dark bg-warning mb-3">
-                <div class="card-header">Трансфер</div>
-                <div class="card-body">
-                    <h5 class="card-title">
-                        Семей: <span th:text="${stats.familiesNeedingTransfer}">0</span>
-                    </h5>
-                    <p class="card-text" style="font-size: 0.9rem; margin-top: -10px;">
-                        (<span>Гостей: </span>
-                        <span th:text="${stats.peopleNeedingTransfer}">0</span>)
-                    </p>
-                    <a th:href="@{/admin/guests(transfer=true, attending=true)}" class="btn btn-dark">Кто?</a>
-                </div>
-            </div>
-        </div>
         <!-- Карточка размещения -->
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="card text-white bg-info mb-3">
                 <div class="card-header">Размещение</div>
                 <div class="card-body">
@@ -66,26 +50,44 @@
         </div>
     </div>
 
-
-    <h2>Предпочтения по напиткам (среди подтвержденных)</h2>
-    <div th:if="${stats.beverageStats.isEmpty()}" class="alert alert-secondary">
-        Нет данных о предпочтениях.
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Трансфер (подтвержденные)</h2>
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                <tr>
+                    <th>Опция</th>
+                    <th>Семей</th>
+                    <th>Гостей</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="option : ${stats.allTransferOptions}" th:if="${option.name() != 'NOT_REQUIRED'}">
+                    <td th:text="${option.displayName}"></td>
+                    <td th:text="${stats.transferFamiliesStats.get(option) ?: 0}"></td>
+                    <td th:text="${stats.transferPeopleStats.get(option) ?: 0}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h2>Предпочтения по напиткам (подтвержденные)</h2>
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                <tr>
+                    <th>Напиток</th>
+                    <th>Количество выборов</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="beverage : ${stats.allBeverages}">
+                    <td th:text="${beverage.getName()}">Название напитка</td>
+                    <td th:text="${stats.beverageStats.get(beverage) ?: 0}">0</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <table class="table table-striped" th:if="${!stats.beverageStats.isEmpty()}">
-        <thead class="thead-dark">
-        <tr>
-            <th>Напиток</th>
-            <th>Количество выборов</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="beverage : ${stats.allBeverages}">
-            <td th:text="${beverage.getName()}">Название напитка</td>
-            <td th:text="${stats.beverageStats.get(beverage) ?: 0}">0</td>
-        </tr>
-        </tbody>
-    </table>
-
 </div>
 <div th:replace="~{fragments/admin-scripts :: scripts}"></div>
 </body>

@@ -26,12 +26,12 @@
                     <p><strong>Персональная ссылка:</strong>
                         <a th:href="@{'/' + ${family.personalLink}}" th:text="${family.personalLink}" target="_blank"></a>
                     </p>
-                    <p><strong>Телефон:</strong> <span th:text="${family.phone ?: '-'}"></span></p>
+                    <p><strong>Телефон:</strong> <span th:text="${family.displayPhone ?: '-'}"></span></p>
                     <p><strong>Версия (JPA):</strong> <span th:text="${family.version}"></span></p>
                 </div>
                 <div class="col-md-6">
                     <p><strong>Активна:</strong> <span th:text="${family.active ? 'Да' : 'Нет'}" th:classappend="${family.active ? 'text-success' : 'text-danger'}"></span></p>
-                    <p><strong>Требуется трансфер:</strong> <span th:text="${family.transferRequired ? 'Да' : 'Нет'}"></span></p>
+                    <p><strong>Трансфер:</strong> <span th:text="${family.transferOption.displayName}"></span></p>
                     <p><strong>Требуется размещение:</strong> <span th:text="${family.placementRequired ? 'Да' : 'Нет'}"></span></p>
                     <p><strong>Дедлайн подтверждения:</strong> <span th:text="${#temporals.format(family.confirmationDeadline, 'dd.MM.yyyy')}"></span></p>
                 </div>

@@ -47,7 +47,7 @@
             <td th:text="${guest.name}">Имя Гостя</td>
             <td><a th:href="@{/admin/families/{id}(id=${guest.family.id})}" th:text="${guest.family.name}">Семья</a></td>
             <td><span th:text="${guest.willAttend ? 'Да' : 'Нет'}" th:classappend="${guest.willAttend ? 'text-success' : 'text-danger'}"></span></td>
-            <td><span th:text="${guest.family.transferRequired ? 'Да' : 'Нет'}"></span></td>
+            <td th:text="${guest.family.transferOption.displayName}"></td>
             <td><span th:text="${guest.family.placementRequired ? 'Да' : 'Нет'}"></span></td>
             <td>
                 <span th:each="beverage, iterStat : ${guest.beverages}" th:text="${beverage.getName()} + (${iterStat.last} ? '' : ', ')"></span>

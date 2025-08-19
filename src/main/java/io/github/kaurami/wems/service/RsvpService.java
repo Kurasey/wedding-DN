@@ -40,6 +40,7 @@ public class RsvpService {
         if (rsvpRequest.getContactPhone() != null && !rsvpRequest.getContactPhone().isBlank()) {
             family.setPhone(rsvpRequest.getContactPhone());
         }
+        family.setTransferOption(rsvpRequest.getTransferOption());
 
         // --- ЛОГИКА СРАВНЕНИЯ И УВЕДОМЛЕНИЙ ---
 

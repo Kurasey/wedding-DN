@@ -27,15 +27,12 @@
         </form>
     </div>
 
-    <!-- ... сообщения об успехе/ошибке ... -->
-
     <a th:href="@{/admin/families/new}" class="btn btn-success mb-3">Добавить Семью</a>
     <div class="table-responsive">
         <table class="table table-hover">
             <thead class="thead-light">
             <tr>
                 <th>Название</th>
-                <th>Телефон</th>
                 <th>Гостей / Макс.</th>
                 <th>Активна</th>
                 <th>Трансфер</th>
@@ -49,13 +46,12 @@
                 <td th:classappend="${#lists.isEmpty(family.guests) or family.guests.?[willAttend == true].empty} ? 'problem-family' : ''">
                     <a th:href="@{/admin/families/{id}(id=${family.id})}" th:text="${family.name}">Название семьи</a>
                 </td>
-                <td th:text="${family.phone ?: '-'}">Телефон</td>
                 <td th:text="${#lists.size(family.guests)} + ' / ' + ${family.maxAvailableGuestCount}">0 / 2</td>
                 <td>
             <span th:text="${family.active ? 'Да' : 'Нет'}"
                   th:classappend="${family.active ? 'text-success' : 'text-danger'}"></span>
                 </td>
-                <td th:text="${family.transferRequired ? 'Да' : 'Нет'}">Нет</td>
+                <td th:text="${family.transferOption.displayName}">Нет</td>
                 <td th:text="${family.placementRequired ? 'Да' : 'Нет'}">Нет</td>
                 <td><a th:href="@{'/' + ${family.personalLink}}" th:text="${family.personalLink}" target="_blank" title="Открыть приглашение">ссылка</a></td>
                 <td>

@@ -23,7 +23,6 @@
                 <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
             </div>
 
-            <!-- Поле для ручного ввода ссылки (только при создании) -->
             <div class="col-md-6 mb-3" th:if="${family.id == null}">
                 <label for="personalLink">Персональная ссылка (необязательно)</label>
                 <input type="text" class="form-control" id="personalLink" th:field="*{personalLink}"
@@ -31,7 +30,6 @@
                 <small class="form-text text-muted">Можно использовать буквы и цифры. Например: best_friends</small>
             </div>
 
-            <!-- Поле для отображения готовой ссылки (только при редактировании) -->
             <div class="col-md-6 mb-3" th:if="${family.id != null && family.personalLink != null}">
                 <label for="personalLinkDisplay">Персональная ссылка</label>
                 <input type="text" class="form-control" id="personalLinkDisplay" th:value="${baseUrl} + '/' + *{personalLink}" readonly>
@@ -64,23 +62,33 @@
             </div>
         </div>
 
-        <div class="form-group">
-            <div class="form-check form-check-inline">
-                <input type="checkbox" class="form-check-input" id="isActive" th:field="*{active}">
-                <label class="form-check-label" for="isActive">Активна</label>
+        <div class="form-row align-items-center">
+            <div class="col-auto">
+                <div class="form-check form-check-inline">
+                    <input type="checkbox" class="form-check-input" id="isActive" th:field="*{active}">
+                    <label class="form-check-label" for="isActive">Активна</label>
+                </div>
             </div>
-            <div class="form-check form-check-inline">
-                <input type="checkbox" class="form-check-input" id="isTransferRequired" th:field="*{transferRequired}">
-                <label class="form-check-label" for="isTransferRequired">Требуется трансфер</label>
+            <div class="col-auto">
+                <div class="form-check form-check-inline">
+                    <input type="checkbox" class="form-check-input" id="isPlacementRequired" th:field="*{placementRequired}">
+                    <label class="form-check-label" for="isPlacementRequired">Требуется размещение</label>
+                </div>
             </div>
-            <div class="form-check form-check-inline">
-                <input type="checkbox" class="form-check-input" id="isPlacementRequired" th:field="*{placementRequired}">
-                <label class="form-check-label" for="isPlacementRequired">Требуется размещение</label>
+            <div class="col-md-4">
+                <label for="transferOption">Трансфер</label>
+                <select id="transferOption" class="form-control" th:field="*{transferOption}">
+                    <option th:each="option : ${T(io.github.kaurami.wems.model.TransferOption).values()}"
+                            th:value="${option}"
+                            th:text="${option.displayName}"></option>
+                </select>
             </div>
         </div>
-        <p class="mt-2"><small>* Обязательные поля</small></p>
-        <button type="submit" class="btn btn-primary" th:text="${family.id == null ? 'Создать Семью' : 'Сохранить Изменения'}">Отправить</button>
-        <a th:href="@{/admin/families}" class="btn btn-secondary">Отмена</a>
+
+
+        <p class="mt-3"><small>* Обязательные поля</small></p>
+        <button type="submit" class="btn btn-primary mt-2" th:text="${family.id == null ? 'Создать Семью' : 'Сохранить Изменения'}">Отправить</button>
+        <a th:href="@{/admin/families}" class="btn btn-secondary mt-2">Отмена</a>
     </form>
 </div>
 <script>

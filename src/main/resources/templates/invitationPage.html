@@ -20,230 +20,230 @@
 </head>
 <body>
 
-    <!-- Секция Прелоадера с конвертом -->
-    <div id="preloader">
-        <img th:src="@{/images/envelope.png}" alt="Открыть приглашение" id="openEnvelopeImage">
+<!-- Секция Прелоадера с конвертом -->
+<div id="preloader">
+    <img th:src="@{/images/envelope.png}" alt="Открыть приглашение" id="openEnvelopeImage">
+</div>
+
+<!-- Секция 1: Главный экран (Hero) -->
+<header id="hero">
+    <img th:src="${assetLocations.mainBackground}"
+         alt=""
+         class="hero-background">
+    <div class="hero-content">
+        <p class="save-the-date"></p>
+        <h1 class="couple-names-hero" th:text="${invitation.groomName} + ' и ' + ${invitation.brideName}"></h1>
+        <p class="wedding-date-hero"
+           th:text="${#temporals.format(invitation.eventDateTime, 'd MMMM, yyyy', #locale)}"></p>
+        <p class="wedding-date-hero" th:text="${invitation.greetingText}"></p>
     </div>
+</header>
 
-    <!-- Секция 1: Главный экран (Hero) -->
-    <header id="hero">
-        <img th:src="${assetLocations.mainBackground}"
-             alt=""
-             class="hero-background">
-        <div class="hero-content">
-	    <p class="save-the-date"></p>
-            <h1 class="couple-names-hero" th:text="${invitation.groomName} + ' и ' + ${invitation.brideName}"></h1>
-            <p class="wedding-date-hero"
-               th:text="${#temporals.format(invitation.eventDateTime, 'd MMMM, yyyy', #locale)}"></p>
-            <p class="wedding-date-hero" th:text="${invitation.greetingText}"></p>
-        </div>
-    </header>
+<button id="musicToggle" class="burger" title="Включить/выключить музыку"></button>
 
-    <button id="musicToggle" class="burger" title="Включить/выключить музыку"></button>
+<button id="burger" class="burger">☰</button>
+<nav id="menu" class="sticky-nav hidden">
 
-    <button id="burger" class="burger">☰</button>
-    <nav id="menu" class="sticky-nav hidden">
+    <a href="#invitation-details">Приглашение</a>
+    <a href="#timeline">План дня</a>
+    <a href="#dress-code">Дресс-код</a>
+    <a href="#A_few_words_from_us">Пара слов от нас</a>
+    <a href="#location">Место</a>
+    <a href="#rsvp">RSVP</a>
+</nav>
 
-        <a href="#invitation-details">Приглашение</a>
-        <a href="#timeline">План дня</a>
-        <a href="#dress-code">Дресс-код</a>
-        <a href="#A_few_words_from_us">Пара слов от нас</a>
-        <a href="#location">Место</a>
-        <a href="#rsvp">RSVP</a>
-    </nav>
+<audio id="audioPlayer" th:src="${assetLocations.backgroundMusic}" type="audio/mpeg" loop></audio>
 
-    <audio id="audioPlayer" th:src="${assetLocations.backgroundMusic}" type="audio/mpeg" loop></audio>
+<!-- Секция 2: Приглашение и детали -->
+<section id="invitation-details" class="content-section">
+    <div class="container">
+        <h2 th:text="${family.appeal}">Дорогие Родные и Друзья!</h2>
+        <p class="intro-text" th:text="${invitation.invitationText}"></p>
 
-    <!-- Секция 2: Приглашение и детали -->
-    <section id="invitation-details" class="content-section">
-        <div class="container">
-            <h2 th:text="${family.appeal}">Дорогие Родные и Друзья!</h2>
-            <p class="intro-text" th:text="${invitation.invitationText}"></p>
-
-            <div class="container my-5 text-center" id="calendar-highlight-section">
-                <h2 class="display-6 mb-4">Отметьте этот день в календаре!</h2>
-                <div id="wedding-calendar-2025-09" class="wedding-calendar">
-                    <!-- Календарь будет сгенерирован JavaScript -->
-                </div>
+        <div class="container my-5 text-center" id="calendar-highlight-section">
+            <h2 class="display-6 mb-4">Отметьте этот день в календаре!</h2>
+            <div id="wedding-calendar-2025-09" class="wedding-calendar">
+                <!-- Календарь будет сгенерирован JavaScript -->
             </div>
+        </div>
 
-            <hr class="divider">
-            <div class="event-info">
-                <div class="event-item">
-                    <section class="section-plan">
-                        <h2>План дня<span th:if="${#lists.isEmpty(timelineItems)}"> пока не определен</span> </h2>
-                        <div class="timeline" id="timeline" th:unless="${#lists.isEmpty(timelineItems)}">
-                            <!-- ДИНАМИЧЕСКИЙ БЛОК -->
-                            <div th:each="item : ${timelineItems}" class="timeline-item">
-                                <img th:src="${item.iconName}" th:alt="${item.title}" loading="lazy">
-                                <div>
-                                    <span th:text="${#temporals.format(item.eventTime, 'HH:mm')}"></span>
-                                    <br>
-                                    <span th:text="${item.title}"></span>
-                                </div>
+        <hr class="divider">
+        <div class="event-info">
+            <div class="event-item">
+                <section class="section-plan">
+                    <h2>План дня<span th:if="${#lists.isEmpty(timelineItems)}"> пока не определен</span> </h2>
+                    <div class="timeline" id="timeline" th:unless="${#lists.isEmpty(timelineItems)}">
+                        <!-- ДИНАМИЧЕСКИЙ БЛОК -->
+                        <div th:each="item : ${timelineItems}" class="timeline-item">
+                            <img th:src="${item.iconName}" th:alt="${item.title}" loading="lazy">
+                            <div>
+                                <span th:text="${#temporals.format(item.eventTime, 'HH:mm')}"></span>
+                                <br>
+                                <span th:text="${item.title}"></span>
                             </div>
                         </div>
-                    </section>
-                </div>
-            </div>
-            <div class="dress-code" id="dress-code">
-                <h2>Дресс-код</h2>
-                <p th:text="${invitation.dressCodeText}">...</p>
-                <div class="color-palette">
-                    <span th:each="color : ${invitation.dressCodePalette}" th:style="'background-color: ' + ${color}"></span>
-                </div>
-            </div>
-            <hr class="divider">
-            <div class="A_few_words_from_us" id="A_few_words_from_us" th:if="${!invitation.wishesFromCouple.isEmpty()}">
-                <h2>Пара слов от нас</h2>
-                <div th:each="wish, iterStat : ${invitation.wishesFromCouple}">
-                    <h2 th:text="${iterStat.count}"></h2> <p><span th:text="${wish}"></span></p> </div>
+                    </div>
+                </section>
             </div>
         </div>
-    </section>
-
-    <!-- Секция 5: Место проведения (Карта) -->
-    <section id="location" class="content-section alt-bg">
-        <div class="container">
-            <h2>Место Проведения</h2>
-            <p>Мы будем ждать вас в <span th:text="${invitation.venueName}"></span> по адресу: <span th:text="${invitation.venueAddress}"></span></p>
-
-            <div id="map" class="map-container"></div>
-        </div>
-        <img th:src="${assetLocations.venuePhoto}" alt="" class="venue-photo" loading="lazy">
-    </section>
-
-    <section id="story" class="content-section alt-bg">
-        <h2>Ждем вас через</h2>
-        <div id="countdown" th:data-target-date="${invitation.eventDateTime.toString()}">
-            <div class="countdown-item">
-                <span id="days">00</span>
-                <span>Дней</span>
-            </div>
-            <div class="countdown-item">
-                <span id="hours">00</span>
-                <span>Часов</span>
-            </div>
-            <div class="countdown-item">
-                <span id="minutes">00</span>
-                <span>Минут</span>
-            </div>
-            <div class="countdown-item">
-                <span id="seconds">00</span>
-                <span>Секунд</span>
+        <div class="dress-code" id="dress-code">
+            <h2>Дресс-код</h2>
+            <p th:text="${invitation.dressCodeText}">...</p>
+            <div class="color-palette">
+                <span th:each="color : ${invitation.dressCodePalette}" th:style="'background-color: ' + ${color}"></span>
             </div>
         </div>
-
-    </section>
-    <!-- Секция 6: Подтверждение присутствия (RSVP) -->
-    <section id="rsvp" class="content-section">
-        <div class="container">
-            <h2>Подтвердите Ваше Присутствие</h2>
-            <p>Мы будем очень благодарны, если вы сообщите о своем решении
-                до <span th:text="${#temporals.format(family.confirmationDeadline, 'd MMMM yyyy', new java.util.Locale('ru'))}">*</span> года</p>
-
-            <p>Это поможет нам сделать наш праздник идеальным для каждого из вас!</p>
-
-            <div class="rsvp-options">
-                <button id="openRsvpModalBtn"
-                        class="button"
-                        th:data-has-responded="${hasResponded}"
-                        th:data-personal-link="${family.personalLink}"
-                        th:disabled="${family.isExpiredDeadline()}">
-                    <span th:if="${hasResponded}">Изменить ответ</span>
-                    <span th:unless="${hasResponded}">Подтвердить Присутствие</span>
-                </button>
-            </div>
-
-            <p th:if="${family.isExpiredDeadline()}" class="deadline-expired">
-                К сожалению, срок подтверждения истек. Пожалуйста, свяжитесь с нами напрямую.
-            </p>
-
-            <p class="rsvp-manual-contact">
-                Или свяжитесь с нами напрямую:
-                <br>Телефон: <a th:href="'tel:' + ${invitation.groomPhone}" th:text="${invitation.groomPhoneDisplay}"></a><span th:text="'(' + ${invitation.groomName} + ')'"></span>
-                <br>Телефон: <a th:href="'tel:' + ${invitation.bridePhone}" th:text="${invitation.bridePhoneDisplay}"></a><span th:text="'(' + ${invitation.brideName} + ')'"></span>
-                <br><a th:href="${invitation.telegramGroupUrl}">Группа Telegram</a>
-                <br><img th:src="@{/qr-code.png}" alt="QR-код для вступления в Telegram-группу" class="qr-code-image">
+        <hr class="divider">
+        <div class="A_few_words_from_us" id="A_few_words_from_us" th:if="${!invitation.wishesFromCouple.isEmpty()}">
+            <h2>Пара слов от нас</h2>
+            <div th:each="wish, iterStat : ${invitation.wishesFromCouple}">
+                <h2 th:text="${iterStat.count}"></h2> <p><span th:text="${wish}"></span></p> </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <div id="music-hint-arrow" class="music-hint hidden">
-        <span>Включите<br>музыку</span>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <path d="M50,0 Q60,20 50,40 Q40,60 50,80" stroke-width="5" fill="none" class="arrow-line"/>
-            <path d="M40,70 L50,80 L60,70" stroke-width="5" fill="none" class="arrow-head"/>
-        </svg>
+<!-- Секция 5: Место проведения (Карта) -->
+<section id="location" class="content-section alt-bg">
+    <div class="container">
+        <h2>Место Проведения</h2>
+        <p>Мы будем ждать вас в <span th:text="${invitation.venueName}"></span> по адресу: <span th:text="${invitation.venueAddress}"></span></p>
+
+        <div id="map" class="map-container"></div>
+    </div>
+    <img th:src="${assetLocations.venuePhoto}" alt="" class="venue-photo" loading="lazy">
+</section>
+
+<section id="story" class="content-section alt-bg">
+    <h2>Ждем вас через</h2>
+    <div id="countdown" th:data-target-date="${invitation.eventDateTime.toString()}">
+        <div class="countdown-item">
+            <span id="days">00</span>
+            <span>Дней</span>
+        </div>
+        <div class="countdown-item">
+            <span id="hours">00</span>
+            <span>Часов</span>
+        </div>
+        <div class="countdown-item">
+            <span id="minutes">00</span>
+            <span>Минут</span>
+        </div>
+        <div class="countdown-item">
+            <span id="seconds">00</span>
+            <span>Секунд</span>
+        </div>
     </div>
 
-    <footer>
-        <p class="footer-names" th:text="${invitation.groomName} + ' и ' + ${invitation.brideName}"></p>
-        <p>&copy; <span id="currentYear"></span>. С любовью и нетерпением ждем нашей встречи!</p>
-    </footer>
+</section>
+<!-- Секция 6: Подтверждение присутствия (RSVP) -->
+<section id="rsvp" class="content-section">
+    <div class="container">
+        <h2>Подтвердите Ваше Присутствие</h2>
+        <p>Мы будем очень благодарны, если вы сообщите о своем решении
+            до <span th:text="${#temporals.format(family.confirmationDeadline, 'd MMMM yyyy', new java.util.Locale('ru'))}">*</span> года</p>
+
+        <p>Это поможет нам сделать наш праздник идеальным для каждого из вас!</p>
+
+        <div class="rsvp-options">
+            <button id="openRsvpModalBtn"
+                    class="button"
+                    th:data-has-responded="${hasResponded}"
+                    th:data-personal-link="${family.personalLink}"
+                    th:disabled="${family.isExpiredDeadline()}">
+                <span th:if="${hasResponded}">Изменить ответ</span>
+                <span th:unless="${hasResponded}">Подтвердить Присутствие</span>
+            </button>
+        </div>
+
+        <p th:if="${family.isExpiredDeadline()}" class="deadline-expired">
+            К сожалению, срок подтверждения истек. Пожалуйста, свяжитесь с нами напрямую.
+        </p>
+
+        <p class="rsvp-manual-contact">
+            Или свяжитесь с нами напрямую:
+            <br>Телефон: <a th:href="'tel:' + ${invitation.groomPhone}" th:text="${invitation.groomPhoneDisplay}"></a><span th:text="'(' + ${invitation.groomName} + ')'"></span>
+            <br>Телефон: <a th:href="'tel:' + ${invitation.bridePhone}" th:text="${invitation.bridePhoneDisplay}"></a><span th:text="'(' + ${invitation.brideName} + ')'"></span>
+            <br><a th:href="${invitation.telegramGroupUrl}">Группа Telegram</a>
+            <br><img th:src="@{/qr-code.png}" alt="QR-код для вступления в Telegram-группу" class="qr-code-image">
+    </div>
+</section>
+
+<div id="music-hint-arrow" class="music-hint hidden">
+    <span>Включите<br>музыку</span>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <path d="M50,0 Q60,20 50,40 Q40,60 50,80" stroke-width="5" fill="none" class="arrow-line"/>
+        <path d="M40,70 L50,80 L60,70" stroke-width="5" fill="none" class="arrow-head"/>
+    </svg>
+</div>
+
+<footer>
+    <p class="footer-names" th:text="${invitation.groomName} + ' и ' + ${invitation.brideName}"></p>
+    <p>&copy; <span id="currentYear"></span>. С любовью и нетерпением ждем нашей встречи!</p>
+</footer>
 <!-- Модальное окно 2: Детали по гостям (ТЕПЕРЬ ЕДИНОЕ ОКНО) -->
-    <div id="rsvpModal2" class="modal">
-        <div class="modal-content">
-            <span class="close-button" id="closeModal2Btn">×</span>
-            <h2>Подтверждение Присутствия</h2>
-            <form id="rsvpForm2">
-                <div class="form-group">
-                    <label for="contactPhone">Ваш контактный номер телефона:</label>
-                    <input type="tel" id="contactPhone" name="contactPhone" placeholder="+7 (XXX) XXX-XX-XX" required
-                           pattern="^(\+|8)[0-9\s\-\(\)]{7,20}$"
-                           th:value="${family.displayPhone}">
-                    <small>Например: +7 (900) 123-45-67</small>
-                </div>
-                <hr>
-                <h3 style="font-family: var(--font-body); font-size: 1.5em; text-align: center; margin-bottom: 20px;">Информация о Гостях</h3>
-                <div id="guest-limit-data"
-                     th:attr="data-max-guests=${family.maxAvailableGuestCount}"
-                     style="display:none;">
-                </div>
+<div id="rsvpModal2" class="modal">
+    <div class="modal-content">
+        <span class="close-button" id="closeModal2Btn">×</span>
+        <h2>Подтверждение Присутствия</h2>
+        <form id="rsvpForm2">
+            <div class="form-group">
+                <label for="contactPhone">Ваш контактный номер телефона:</label>
+                <input type="tel" id="contactPhone" name="contactPhone" placeholder="+7 (XXX) XXX-XX-XX" required
+                       pattern="^(\+|8)[0-9\s\-\(\)]{7,20}$"
+                       th:value="${family.displayPhone}">
+                <small>Например: +7 (900) 123-45-67</small>
+            </div>
+            <hr>
+            <h3 style="font-family: var(--font-body); font-size: 1.5em; text-align: center; margin-bottom: 20px;">Информация о Гостях</h3>
+            <div id="guest-limit-data"
+                 th:attr="data-max-guests=${family.maxAvailableGuestCount}"
+                 style="display:none;">
+            </div>
 
-                <div id="guestDetailsContainer">
-                    <!-- Сюда будут добавляться поля для каждого гостя -->
-                </div>
-                <button type="button" id="addGuestBtn" class="button" style="display: none; background-color: #5a9a5a; margin-top: 15px; margin-bottom: 15px;">Добавить гостя</button>
-                <p class="drink-preference-note">Пожалуйста, укажите предпочтения по напиткам. Это поможет нам лучше подготовиться.</p>
-                <button type="submit" class="button">Отправить Подтверждение</button>
-            </form>
-        </div>
+            <div id="guestDetailsContainer">
+                <!-- Сюда будут добавляться поля для каждого гостя -->
+            </div>
+            <button type="button" id="addGuestBtn" class="button" style="display: none; background-color: #5a9a5a; margin-top: 15px; margin-bottom: 15px;">Добавить гостя</button>
+            <p class="drink-preference-note">Пожалуйста, укажите предпочтения по напиткам. Это поможет нам лучше подготовиться.</p>
+            <button type="submit" class="button">Отправить Подтверждение</button>
+        </form>
     </div>
+</div>
 
 
-    <!-- Модальное окно 3: Подтверждение успешно отправлено -->
-    <div id="rsvpModal3" class="modal">
-        <div class="modal-content">
-            <span class="close-button" id="closeModal3Btn">×</span>
-            <h2>Спасибо!</h2>
-            <p>Ваше подтверждение и предпочтения приняты.<br>Мы с нетерпением ждем встречи с вами!</p>
-            <button id="closeModal3Btn2" class="button">Закрыть</button>
-        </div>
+<!-- Модальное окно 3: Подтверждение успешно отправлено -->
+<div id="rsvpModal3" class="modal">
+    <div class="modal-content">
+        <span class="close-button" id="closeModal3Btn">×</span>
+        <h2>Спасибо!</h2>
+        <p>Ваше подтверждение и предпочтения приняты.<br>Мы с нетерпением ждем встречи с вами!</p>
+        <button id="closeModal3Btn2" class="button">Закрыть</button>
     </div>
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        // --- Общие данные для всех скриптов ---
+</div>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // --- Общие данные для всех скриптов ---
 
-        // Для таймера в script.js
-        const weddingDateTimeISO = /*[[${#temporals.formatISO(invitation.eventDateTime)}]]*/ null;
+    // Для таймера в script.js
+    const weddingDateTimeISO = /*[[${#temporals.formatISO(invitation.eventDateTime)}]]*/ null;
 
-        // Для календаря в heart-script.js
-        const year = /*[[${invitation.eventDateTime.getYear()}]]*/ null;
-        const monthJs = /*[[${invitation.eventDateTime.getMonthValue() - 1}]]*/ null; // JS месяцы 0-11
-        const weddingDay = /*[[${invitation.eventDateTime.getDayOfMonth()}]]*/ null;
+    // Для календаря в heart-script.js
+    const year = /*[[${invitation.eventDateTime.getYear()}]]*/ null;
+    const monthJs = /*[[${invitation.eventDateTime.getMonthValue() - 1}]]*/ null; // JS месяцы 0-11
+    const weddingDay = /*[[${invitation.eventDateTime.getDayOfMonth()}]]*/ null;
 
-        // Для карты в map-script.js
-        const mapCenter = /*[[${ {invitation.venueLatitude, invitation.venueLongitude} }]]*/ null;
-        const mapZoom = /*[[${invitation.mapZoom}]]*/ null;
-        const mapVenueName = /*[[${invitation.venueName}]]*/ null;
+    // Для карты в map-script.js
+    const mapCenter = /*[[${ {invitation.venueLatitude, invitation.venueLongitude} }]]*/ null;
+    const mapZoom = /*[[${invitation.mapZoom}]]*/ null;
+    const mapVenueName = /*[[${invitation.venueName}]]*/ null;
 
-        // Для формы RSVP в script.js
-        const drinkOptionsList = /*[[${allBeverages}]]*/ [];
-        /*]]>*/
-    </script>
-    <script th:src="@{/js/script.js}"></script>
-    <script th:src="@{/js/heart-script.js}"></script>
-    <script th:src="@{/js/audio-player.js}"></script>
-    <script th:src="@{/js/map-script.js}"></script>
+    // Для формы RSVP в script.js
+    const drinkOptionsList = /*[[${allBeverages}]]*/ [];
+    /*]]>*/
+</script>
+<script th:src="@{/js/script.js}"></script>
+<script th:src="@{/js/heart-script.js}"></script>
+<script th:src="@{/js/audio-player.js}"></script>
+<script th:src="@{/js/map-script.js}"></script>
 </body>
 </html>
