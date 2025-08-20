@@ -1,23 +1,23 @@
 services:
-  app:
+  app-nastya:
     build: .
-    container_name: wems-app
+    container_name: wems-app-nastya
     restart: unless-stopped
     env_file: .env
     environment:
       - SPRING_PROFILES_ACTIVE=prod
     # Связываем порт 8088 на хосте с портом 8080 в контейнере.
     ports:
-      - "127.0.0.1:8088:8080"
+      - "127.0.0.1:8089:8080"
     depends_on:
-      - postgres
+      - postgres-nastya
     # Сеть больше не нужна для связи с Nginx, но она все еще нужна для связи с Postgres
     networks:
-      - wems-net
+      - wems-net-nastya
 
-  postgres:
+  postgres-nastya:
     image: postgres:16-alpine
-    container_name: wems-db
+    container_name: wems-db-nastya
     restart: unless-stopped
     env_file: .env
     environment:
@@ -25,14 +25,16 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data-nastya:/var/lib/postgresql/data
     networks:
-      - wems-net
+      wems-net-nastya:
+        aliases:
+          - postgres
 
 networks:
-  wems-net:
+  wems-net-nastya:
     driver: bridge
 
 volumes:
-  postgres-data:
+  postgres-data-nastya:
     driver: local

@@ -66,7 +66,7 @@ public class InvitationPageController {
         String icsContent = String.join("\r\n",
                 "BEGIN:VCALENDAR",
                 "VERSION:2.0",
-                "PRODID:-//dya-wedding.duckdns.org",
+                "PRODID:-//dmitry-and-anastasia-wedding.duckdns.org",
                 "BEGIN:VEVENT",
                 "UID:" + UUID.randomUUID(),
                 "DTSTAMP:" + formatter.format(ZonedDateTime.now()),
@@ -80,8 +80,7 @@ public class InvitationPageController {
         );
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, "text/calendar; charset=utf-8");
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"wedding_event.ics\"");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"event.ics\"");
         return new ResponseEntity<>(icsContent, headers, HttpStatus.OK);
-
     }
 }
